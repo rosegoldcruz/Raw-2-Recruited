@@ -6,23 +6,23 @@ import { Button } from "@/components/ui/button"
 const mediaItems = [
   {
     type: "image",
-    src: "/images/whatsapp-20image-202026-01-07-20at-2012.jpeg",
-    alt: "Xander Ivester - Class of 2030 - Tight End / Defensive End",
+    src: "/assests/star.jpeg",
+    alt: "Training star athlete",
   },
   {
     type: "video",
-    src: "/football-player-catching-ball-action-shot.jpg",
-    alt: "Catching drills",
+    src: "/assests/raw.mp4",
+    alt: "Raw training footage",
   },
   {
     type: "image",
-    src: "/youth-football-team-training-session-night-lights.jpg",
-    alt: "Team training session",
+    src: "/assests/wework.jpeg",
+    alt: "We work together",
   },
   {
     type: "video",
-    src: "/football-speed-agility-cone-drills-athlete.jpg",
-    alt: "Speed and agility training",
+    src: "/assests/huddle.mp4",
+    alt: "Team huddle",
   },
 ]
 
@@ -45,16 +45,26 @@ export function MediaPreview() {
               key={index}
               className="group relative aspect-[3/4] rounded-xl overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 cursor-pointer"
             >
-              <Image
-                src={item.src || "/placeholder.svg"}
-                alt={item.alt}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              {item.type === "image" ? (
+                <Image
+                  src={item.src || "/placeholder.svg"}
+                  alt={item.alt}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              ) : (
+                <video
+                  src={item.src}
+                  className="w-full h-full object-cover"
+                  loop
+                  muted
+                  playsInline
+                />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
               {item.type === "video" && (
-                <div className="absolute inset-0 flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div className="w-12 h-12 bg-primary/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                     <Play className="w-5 h-5 text-primary-foreground ml-1" fill="currentColor" />
                   </div>

@@ -1,6 +1,9 @@
+"use client"
+
 import Image from "next/image"
 import { Instagram } from "lucide-react"
 import Link from "next/link"
+import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card"
 
 const coaches = [
   {
@@ -32,46 +35,53 @@ export function CoachesSection() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {coaches.map((coach, index) => (
-            <div
-              key={index}
-              className="group bg-background border border-border rounded-2xl overflow-hidden hover:border-primary/50 transition-all duration-300"
-            >
-              <div className="relative aspect-square overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent z-10" />
-                <Image
-                  src={coach.image || "/placeholder.svg"}
-                  alt={coach.name}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              </div>
-
-              <div className="p-6 -mt-20 relative z-20">
-                <div className="bg-card border border-border rounded-xl p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h3 className="text-2xl font-black text-foreground">{coach.name}</h3>
-                      <p className="text-primary font-semibold">{coach.role}</p>
-                    </div>
+            <CardContainer key={index} className="inter-var">
+              <CardBody className="bg-background relative group/card dark:hover:shadow-2xl dark:hover:shadow-primary/[0.1] border-border w-auto sm:w-[30rem] h-auto rounded-xl p-6 border">
+                <CardItem
+                  translateZ="50"
+                  className="text-2xl font-black text-foreground"
+                >
+                  {coach.name}
+                </CardItem>
+                <CardItem
+                  as="p"
+                  translateZ="60"
+                  className="text-primary font-semibold text-sm mt-2"
+                >
+                  {coach.role}
+                </CardItem>
+                <CardItem translateZ="100" className="w-full mt-4">
+                  <div className="relative aspect-square overflow-hidden rounded-xl">
+                    <Image
+                      src={coach.image || "/placeholder.svg"}
+                      alt={coach.name}
+                      fill
+                      className="object-cover group-hover/card:scale-105 transition-transform duration-500"
+                    />
                   </div>
-
-                  <p className="text-muted-foreground mb-4 leading-relaxed">{coach.bio}</p>
-
-                  <div className="flex flex-wrap gap-2">
-                    {coach.specialties.map((specialty, specialtyIndex) => (
-                      <span
-                        key={specialtyIndex}
-                        className="bg-primary/10 text-primary text-xs font-semibold px-3 py-1 rounded-full"
-                      >
-                        {specialty}
-                      </span>
-                    ))}
-                  </div>
+                </CardItem>
+                <CardItem
+                  as="p"
+                  translateZ="60"
+                  className="text-muted-foreground text-sm mt-4 leading-relaxed"
+                >
+                  {coach.bio}
+                </CardItem>
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {coach.specialties.map((specialty, specialtyIndex) => (
+                    <CardItem
+                      key={specialtyIndex}
+                      translateZ={20}
+                      className="bg-primary/10 text-primary text-xs font-semibold px-3 py-1 rounded-full"
+                    >
+                      {specialty}
+                    </CardItem>
+                  ))}
                 </div>
-              </div>
-            </div>
+              </CardBody>
+            </CardContainer>
           ))}
         </div>
 

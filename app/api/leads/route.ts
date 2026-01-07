@@ -12,11 +12,23 @@ function safeStringify(value: unknown): string {
   }
 }
 
-async function sendTelegramMessage(text: string): Promise<void> {
+async function sendTelegramMessage(text: string): Promise<boolean> {
   const token = process.env.DYLAN_TELEGRAM_BOT_TOKEN
   const chatId = process.env.DYLAN_CHAT_ID
 
-  if (!token || !chatId) return
+  console.log("[Telegram] Attempting to send message", {
+    hasToken: !!token,
+    hasChatId: !!chatId,
+    messageLength: text.length,
+  })
+
+  if (!token || !chatId) {
+    console.error("[Telegram] CRITICAL: Missing environment variables", {
+      DYLAN_TELEGRAM_BOT_TOKEN: token ? "SET" : "MISSING",
+      DYLAN_CHAT_ID: chatId ? "SET" : "MISSING",
+    })
+    return false
+  }
 
   try {
     const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
@@ -30,22 +42,33 @@ async function sendTelegramMessage(text: string): Promise<void> {
       }),
     })
 
+    const responseBody = await response.text()
+
     if (!response.ok) {
-      // Log silently (server logs only); never throw.
-      console.error("Telegram sendMessage failed", {
+      console.error("[Telegram] sendMessage failed", {
         status: response.status,
         statusText: response.statusText,
-        body: await response.text().catch(() => ""),
+        body: responseBody,
       })
+      return false
     }
+
+    console.log("[Telegram] Message sent successfully", {
+      status: response.status,
+      response: responseBody.substring(0, 200),
+    })
+    return true
   } catch (error) {
-    console.error("Telegram sendMessage error", error)
+    console.error("[Telegram] sendMessage error", error)
+    return false
   }
 }
 
 export const runtime = "nodejs"
 
 export async function POST(request: Request) {
+  console.log("[API /api/leads] Received POST request")
+
   let payload: LeadPayload | null = null
 
   try {
@@ -56,11 +79,15 @@ export async function POST(request: Request) {
       payload = { payload: body as JsonValue }
     }
   } catch {
+    console.error("[API /api/leads] Invalid JSON in request body")
     return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 })
   }
 
-  // Treat receipt of the payload as a successful submission (no persistence configured yet).
-  // Telegram notification must not block or fail the response.
+  console.log("[API /api/leads] Parsed payload", {
+    source: payload?.source || "unknown",
+    hasData: !!payload,
+  })
+
   const meta = {
     receivedAt: new Date().toISOString(),
     referer: request.headers.get("referer"),
@@ -69,8 +96,20 @@ export async function POST(request: Request) {
 
   const message = `🔥 New Lead\n${safeStringify({ ...meta, ...payload })}`
 
-  // Fire-and-forget; do not block the response.
-  void sendTelegramMessage(message)
+  // Send to Telegram and wait for result
+  const sent = await sendTelegramMessage(message)
 
+  if (!sent) {
+    console.error("[API /api/leads] FAILED to send Telegram message - returning error to client")
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "Failed to send notification. Please contact support or try again.",
+      },
+      { status: 500 }
+    )
+  }
+
+  console.log("[API /api/leads] Successfully sent to Telegram, returning success")
   return NextResponse.json({ ok: true })
 }
