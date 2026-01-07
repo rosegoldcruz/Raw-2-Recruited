@@ -6,11 +6,11 @@ import { GraduationCap, Crown, Users, Flag } from "lucide-react"
 
 const programs = [
   {
-    title: "ESA / Homeschool PE Credits",
+    title: "Women's Flag Football",
     description:
-      "Earn full PE credits through our state-accredited athletic training program. Perfect for Homeschool and ESA families looking for structured physical education.",
-    href: "/programs/esa",
-    icon: GraduationCap,
+      "Dedicated training for female athletes. Build elite skills for the growing competitive landscape and college pipeline opportunities.",
+    href: "/programs/womens-flag-football",
+    icon: Flag,
   },
   {
     title: "Private 1-on-1 Training",
@@ -27,11 +27,11 @@ const programs = [
     icon: Users,
   },
   {
-    title: "Women's Flag Football",
+    title: "ESA / Homeschool PE Credits",
     description:
-      "Dedicated training for female athletes. Build elite skills for the growing competitive landscape and college pipeline opportunities.",
-    href: "/programs/womens-flag-football",
-    icon: Flag,
+      "Earn full PE credits through our state-accredited athletic training program. Perfect for Homeschool and ESA families looking for structured physical education.",
+    href: "/programs/esa",
+    icon: GraduationCap,
   },
 ]
 

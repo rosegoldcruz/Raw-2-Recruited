@@ -103,12 +103,12 @@ export function Navbar() {
                     </Link>
                     <div className="h-px bg-border" />
                     <Link
-                      href="/programs/esa"
+                      href="/programs/womens-flag-football"
                       role="menuitem"
                       className="block px-4 py-3 text-sm text-foreground hover:bg-accent transition-colors"
                       onClick={() => setDesktopProgramsOpen(false)}
                     >
-                      ESA / Homeschool PE
+                      Women&apos;s Flag Football
                     </Link>
                     <Link
                       href="/programs/private-training"
@@ -127,12 +127,12 @@ export function Navbar() {
                       Team Clinics
                     </Link>
                     <Link
-                      href="/programs/womens-flag-football"
+                      href="/programs/esa"
                       role="menuitem"
                       className="block px-4 py-3 text-sm text-foreground hover:bg-accent transition-colors"
                       onClick={() => setDesktopProgramsOpen(false)}
                     >
-                      Women&apos;s Flag Football
+                      ESA / Homeschool PE
                     </Link>
                   </div>
                 )}
@@ -230,11 +230,11 @@ export function Navbar() {
                 All Programs
               </Link>
               <Link
-                href="/programs/esa"
+                href="/programs/womens-flag-football"
                 className="block pl-16 pr-6 py-3 text-muted-foreground hover:text-primary hover:bg-accent transition-colors"
                 onClick={closeNav}
               >
-                ESA / Homeschool PE
+                Women&apos;s Flag Football
               </Link>
               <Link
                 href="/programs/private-training"
@@ -251,11 +251,11 @@ export function Navbar() {
                 Team Clinics
               </Link>
               <Link
-                href="/programs/womens-flag-football"
+                href="/programs/esa"
                 className="block pl-16 pr-6 py-3 text-muted-foreground hover:text-primary hover:bg-accent transition-colors"
                 onClick={closeNav}
               >
-                Women's Flag Football
+                ESA / Homeschool PE
               </Link>
             </div>
           </div>
