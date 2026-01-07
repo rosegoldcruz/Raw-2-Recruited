@@ -55,6 +55,7 @@ const thisIsNotFor = [
 ]
 
 export default function ESAPage() {
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     athleteName: "",
     age: "",
@@ -67,9 +68,32 @@ export default function ESAPage() {
     parentPhone: "",
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log("ESA Application:", formData)
+
+    try {
+      setIsSubmitting(true)
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          source: "esa",
+          ...formData,
+        }),
+      })
+
+      if (!res.ok) {
+        throw new Error(`Lead submission failed: ${res.status}`)
+      }
+
+      console.log("ESA Application submitted:", formData)
+      alert("Application submitted. We will contact you soon.")
+    } catch (err) {
+      console.error("Lead submission failed", err)
+      alert("Submission failed. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -414,9 +438,10 @@ export default function ESAPage() {
             <Button
               type="submit"
               size="lg"
+              disabled={isSubmitting}
               className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg py-6 h-auto"
             >
-              Submit Application
+              {isSubmitting ? "Submitting..." : "Submit Application"}
               <ArrowRight className="ml-2" />
             </Button>
 

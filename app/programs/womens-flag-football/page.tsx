@@ -28,6 +28,7 @@ const whyNowBullets = [
 
 export default function WomensFlagFootballPage() {
   const [formStep, setFormStep] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     athleteName: "",
     age: "",
@@ -42,6 +43,31 @@ export default function WomensFlagFootballPage() {
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const handleSubmit = async () => {
+    try {
+      setIsSubmitting(true)
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          source: "womens-flag-football",
+          ...formData,
+        }),
+      })
+
+      if (!res.ok) {
+        throw new Error(`Lead submission failed: ${res.status}`)
+      }
+
+      alert("Application submitted. We will contact you soon.")
+    } catch (err) {
+      console.error("Lead submission failed", err)
+      alert("Submission failed. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const nextStep = () => setFormStep((prev) => Math.min(prev + 1, 3))
@@ -446,8 +472,10 @@ export default function WomensFlagFootballPage() {
                   <Button
                     type="submit"
                     className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-bold"
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
                   >
-                    Submit Application
+                    {isSubmitting ? "Submitting..." : "Submit Application"}
                     <CheckCircle2 className="ml-2 w-4 h-4" />
                   </Button>
                 </div>

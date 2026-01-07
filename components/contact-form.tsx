@@ -13,16 +13,33 @@ import { CheckCircle2, Loader2 } from "lucide-react"
 export function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [program, setProgram] = useState("")
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsSubmitting(true)
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    try {
+      const rawEntries = Array.from(new FormData(e.currentTarget).entries())
+      const payload = Object.fromEntries(rawEntries)
 
-    setIsSubmitting(false)
-    setIsSubmitted(true)
+      await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          source: "contact",
+          ...payload,
+          program: program || (payload.program as string | undefined) || "",
+        }),
+      })
+
+      setIsSubmitted(true)
+    } catch (err) {
+      console.error("Lead submission failed", err)
+      alert("Submission failed. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (isSubmitted) {
@@ -120,7 +137,7 @@ export function ContactForm() {
         <Label htmlFor="program" className="text-foreground">
           Program Interest
         </Label>
-        <Select name="program" required>
+        <Select name="program" value={program} onValueChange={setProgram} required>
           <SelectTrigger className="bg-background border-border text-foreground">
             <SelectValue placeholder="Select a program" />
           </SelectTrigger>

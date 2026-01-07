@@ -59,6 +59,7 @@ const thisIsNotFor = [
 
 export default function PrivateTrainingPage() {
   const [formStep, setFormStep] = useState(1)
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     athleteName: "",
     athleteAge: "",
@@ -75,9 +76,31 @@ export default function PrivateTrainingPage() {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    alert("Application submitted. We will review and contact qualified candidates.")
+
+    try {
+      setIsSubmitting(true)
+      const res = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          source: "private-training",
+          ...formData,
+        }),
+      })
+
+      if (!res.ok) {
+        throw new Error(`Lead submission failed: ${res.status}`)
+      }
+
+      alert("Application submitted. We will review and contact qualified candidates.")
+    } catch (err) {
+      console.error("Lead submission failed", err)
+      alert("Submission failed. Please try again.")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -487,9 +510,10 @@ export default function PrivateTrainingPage() {
                   </Button>
                   <Button
                     type="submit"
+                    disabled={isSubmitting}
                     className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-bold"
                   >
-                    Submit Application
+                    {isSubmitting ? "Submitting..." : "Submit Application"}
                   </Button>
                 </div>
               </div>
