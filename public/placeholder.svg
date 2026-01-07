@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-label="Placeholder image">
+  <rect width="800" height="600" fill="#111"/>
+  <rect x="24" y="24" width="752" height="552" fill="none" stroke="#444" stroke-width="4"/>
+  <path d="M120 440 L280 300 L420 420 L540 320 L680 440" fill="none" stroke="#444" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="260" cy="220" r="44" fill="none" stroke="#444" stroke-width="8"/>
+  <text x="50%" y="92%" text-anchor="middle" font-family="system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif" font-size="28" fill="#666">Image unavailable</text>
+</svg>
