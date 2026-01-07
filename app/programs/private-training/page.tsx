@@ -317,6 +317,7 @@ export default function PrivateTrainingPage() {
                       value={formData.athleteAge}
                       onChange={(e) => handleInputChange("athleteAge", e.target.value)}
                       placeholder="Age"
+                      min={8}
                       required
                       className="bg-card border-border"
                     />

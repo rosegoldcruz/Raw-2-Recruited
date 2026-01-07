@@ -286,7 +286,7 @@ export default function WomensFlagFootballPage() {
                           <SelectValue placeholder="Select age" />
                         </SelectTrigger>
                         <SelectContent>
-                          {[11, 12, 13, 14, 15, 16, 17, 18].map((age) => (
+                          {[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map((age) => (
                             <SelectItem key={age} value={age.toString()}>
                               {age}
                             </SelectItem>

@@ -79,7 +79,7 @@ export function ContactForm() {
             name="athleteAge"
             type="number"
             placeholder="Age"
-            min="5"
+            min="8"
             max="25"
             required
             className="bg-background border-border text-foreground"

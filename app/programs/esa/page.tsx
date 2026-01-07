@@ -282,6 +282,7 @@ export default function ESAPage() {
                     value={formData.age}
                     onChange={(e) => setFormData({ ...formData, age: e.target.value })}
                     placeholder="Age"
+                    min={8}
                     required
                     className="bg-background border-border"
                   />
