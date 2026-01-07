@@ -4,33 +4,38 @@ import { Play } from "lucide-react"
 const mediaItems = [
   {
     type: "image",
-    src: "/football-training-youth-athlete-running-drills-fie.jpg",
-    alt: "Athlete training on field",
+    src: "/assests/star.jpeg",
+    alt: "Raw2Recruited training",
   },
   {
     type: "video",
-    src: "/football-player-catching-ball-action-shot.jpg",
-    alt: "Catching drills",
+    src: "/assests/feet.mp4",
+    alt: "Footwork drills",
   },
   {
     type: "image",
-    src: "/youth-football-team-training-session-night-lights.jpg",
-    alt: "Team training session",
+    src: "/assests/wrastle.jpeg",
+    alt: "Wrestling technique training",
   },
   {
     type: "video",
-    src: "/football-speed-agility-cone-drills-athlete.jpg",
-    alt: "Speed and agility training",
-  },
-  {
-    type: "image",
-    src: "/offensive-lineman-football-blocking-technique-trai.jpg",
-    alt: "O-line technique training",
+    src: "/assests/huddle.mp4",
+    alt: "Team huddle",
   },
   {
     type: "video",
-    src: "/wide-receiver-route-running-football-training.jpg",
-    alt: "Route running drills",
+    src: "/assests/raw.mp4",
+    alt: "Raw training footage",
+  },
+  {
+    type: "video",
+    src: "/assests/raw2.mp4",
+    alt: "Raw training session",
+  },
+  {
+    type: "video",
+    src: "/assests/WhatsApp Video 2026-01-07 at 4.06.58 PM.mp4",
+    alt: "Training highlights",
   },
 ]
 
@@ -53,16 +58,27 @@ export function MediaGallery() {
               key={index}
               className="group relative aspect-[3/4] rounded-xl overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 cursor-pointer"
             >
-              <Image
-                src={item.src || "/placeholder.svg"}
-                alt={item.alt}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              {item.type === "image" ? (
+                <Image
+                  src={item.src || "/placeholder.svg"}
+                  alt={item.alt}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              ) : (
+                <video
+                  src={item.src}
+                  className="w-full h-full object-cover"
+                  controls
+                  preload="metadata"
+                >
+                  <source src={item.src} type="video/mp4" />
+                </video>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
 
               {item.type === "video" && (
-                <div className="absolute inset-0 flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div className="w-12 h-12 bg-primary/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                     <Play className="w-5 h-5 text-primary-foreground ml-1" fill="currentColor" />
                   </div>

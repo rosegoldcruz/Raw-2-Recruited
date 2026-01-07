@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
@@ -58,6 +59,7 @@ const thisIsNotFor = [
 ]
 
 export default function PrivateTrainingPage() {
+  const router = useRouter()
   const [formStep, setFormStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
@@ -94,7 +96,7 @@ export default function PrivateTrainingPage() {
         throw new Error(`Lead submission failed: ${res.status}`)
       }
 
-      alert("Application submitted. We will review and contact qualified candidates.")
+      router.push("/thank-you")
     } catch (err) {
       console.error("Lead submission failed", err)
       alert("Submission failed. Please try again.")

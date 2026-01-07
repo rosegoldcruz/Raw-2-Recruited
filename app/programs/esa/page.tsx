@@ -2,6 +2,7 @@
 
 import type React from "react"
 
+import { useRouter } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
@@ -55,6 +56,7 @@ const thisIsNotFor = [
 ]
 
 export default function ESAPage() {
+  const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
     athleteName: "",
@@ -86,8 +88,7 @@ export default function ESAPage() {
         throw new Error(`Lead submission failed: ${res.status}`)
       }
 
-      console.log("ESA Application submitted:", formData)
-      alert("Application submitted. We will contact you soon.")
+      router.push("/thank-you")
     } catch (err) {
       console.error("Lead submission failed", err)
       alert("Submission failed. Please try again.")

@@ -1,5 +1,6 @@
 "use client"
 
+import { useRouter } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
@@ -27,6 +28,7 @@ const whyNowBullets = [
 ]
 
 export default function WomensFlagFootballPage() {
+  const router = useRouter()
   const [formStep, setFormStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({
@@ -61,7 +63,7 @@ export default function WomensFlagFootballPage() {
         throw new Error(`Lead submission failed: ${res.status}`)
       }
 
-      alert("Application submitted. We will contact you soon.")
+      router.push("/thank-you")
     } catch (err) {
       console.error("Lead submission failed", err)
       alert("Submission failed. Please try again.")

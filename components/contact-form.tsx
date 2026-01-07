@@ -3,6 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CheckCircle2, Loader2 } from "lucide-react"
 
 export function ContactForm() {
+  const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [program, setProgram] = useState("")
@@ -33,7 +35,7 @@ export function ContactForm() {
         }),
       })
 
-      setIsSubmitted(true)
+      router.push("/thank-you")
     } catch (err) {
       console.error("Lead submission failed", err)
       alert("Submission failed. Please try again.")

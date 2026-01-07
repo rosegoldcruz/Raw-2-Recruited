@@ -15,7 +15,7 @@ const coaches = [
     role: "Head Trainer - Speed & Skills",
     bio: "Speed and agility expert focusing on the nuances of skill positions. Develops explosive athletes with elite route-running, catching, and defensive back techniques.",
     specialties: ["Speed Training", "Agility Drills", "Route Running", "Position Work"],
-    image: "/athletic-trainer-male-football-coach-portrait.jpg",
+    image: "/assests/coach.jpeg",
   },
 ]
 
