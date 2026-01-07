@@ -20,7 +20,7 @@ export function HeroSection() {
           <div className="text-center lg:text-left">
             <div className="inline-flex items-center gap-2 bg-primary/10 border border-primary/20 rounded-full px-4 py-2 mb-6">
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-              <span className="text-primary text-sm font-semibold tracking-wide">NOW ENROLLING FOR 2025</span>
+              <span className="text-primary text-sm font-semibold tracking-wide">NOW ENROLLING FOR 2026</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-black leading-tight mb-6">
