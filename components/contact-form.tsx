@@ -84,6 +84,7 @@ export function ContactForm() {
             required
             className="bg-background border-border text-foreground"
           />
+          <p className="text-xs text-muted-foreground">Eligibility: ages 8+ only (6th grade and above).</p>
         </div>
 
         <div className="space-y-2">

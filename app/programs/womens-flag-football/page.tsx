@@ -186,7 +186,7 @@ export default function WomensFlagFootballPage() {
               </div>
               <ul className="space-y-4">
                 {[
-                  "You're a Middle School or High School athlete",
+                  "You're 6th grade+ (ages 8+) and serious about development",
                   "You have college aspirations (scholarship or walk-on)",
                   "You want to compete, not just participate",
                   "You're willing to put in the work others won't",
@@ -238,6 +238,7 @@ export default function WomensFlagFootballPage() {
             <p className="text-muted-foreground text-lg">
               Complete your application below. We review every submission and reach out to qualified athletes.
             </p>
+            <p className="text-muted-foreground text-sm mt-2">Eligibility: ages 8+ only (6th grade and above).</p>
           </div>
 
           <div className="bg-card border border-border rounded-2xl p-8">
@@ -317,6 +318,7 @@ export default function WomensFlagFootballPage() {
                       </Select>
                     </div>
                   </div>
+                  <p className="text-xs text-muted-foreground">Eligibility: ages 8+ only (6th grade and above).</p>
                   <div>
                     <Label htmlFor="school" className="text-foreground">
                       School *

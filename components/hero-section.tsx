@@ -35,7 +35,7 @@ export function HeroSection() {
               Multi-position, multi-path athlete development. From{" "}
               <strong className="text-foreground">PE credits</strong> to{" "}
               <strong className="text-foreground">private coaching</strong> — we build complete football players ready
-              for the next level.
+              for the next level. <strong className="text-foreground">Ages 8+ only (6th grade and above).</strong>
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">

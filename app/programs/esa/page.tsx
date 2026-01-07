@@ -41,8 +41,8 @@ const pathwaySteps = [
 ]
 
 const thisIsFor = [
-  "Middle school athletes ready to train like competitors",
-  "Early high school athletes building toward varsity",
+  "6th grade+ athletes (ages 8+) ready to train like competitors",
+  "High school athletes building toward varsity",
   "Homeschool families who want elite development, not just PE checkboxes",
   "Athletes with real goals: make a roster, earn a jersey, compete",
 ]
@@ -286,6 +286,7 @@ export default function ESAPage() {
                     required
                     className="bg-background border-border"
                   />
+                  <p className="text-xs text-muted-foreground">Eligibility: ages 8+ only (6th grade and above).</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="grade" className="text-foreground">
