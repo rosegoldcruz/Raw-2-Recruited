@@ -1,48 +1,169 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Menu, X, ChevronRight, Home, Layers, Users, ImageIcon, Phone } from "lucide-react"
+import { Menu, X, ChevronRight, ChevronDown, Home, Layers, Users, ImageIcon, Phone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
   const [programsExpanded, setProgramsExpanded] = useState(false)
+  const [desktopProgramsOpen, setDesktopProgramsOpen] = useState(false)
+  const desktopProgramsRef = useRef<HTMLDivElement | null>(null)
 
   const closeNav = () => {
     setIsOpen(false)
     setProgramsExpanded(false)
+    setDesktopProgramsOpen(false)
   }
+
+  useEffect(() => {
+    if (!desktopProgramsOpen) return
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setDesktopProgramsOpen(false)
+    }
+
+    const onPointerDown = (event: MouseEvent | TouchEvent) => {
+      const container = desktopProgramsRef.current
+      if (!container) return
+      const target = event.target as Node | null
+      if (target && !container.contains(target)) setDesktopProgramsOpen(false)
+    }
+
+    document.addEventListener("keydown", onKeyDown)
+    document.addEventListener("mousedown", onPointerDown)
+    document.addEventListener("touchstart", onPointerDown)
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown)
+      document.removeEventListener("mousedown", onPointerDown)
+      document.removeEventListener("touchstart", onPointerDown)
+    }
+  }, [desktopProgramsOpen])
 
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
-            {/* Hamburger button */}
-            <button
-              className="text-foreground hover:text-primary transition-colors p-2"
-              onClick={() => setIsOpen(!isOpen)}
-              aria-label="Toggle menu"
-            >
-              <Menu size={28} />
-            </button>
-            {/* Center logo */}
-            <Link href="/" className="flex items-center absolute left-1/2 -translate-x-1/2">
-              <Image
-                src="/images/untitled-20-281024-20x-201128-20px-29.png"
-                alt="RAW2RECRUITED Logo"
-                width={80}
-                height={88}
-                className="h-16 md:h-[74px] w-auto"
-              />
-            </Link>
-            {/* CTA button on right */}
-            <Link href="/contact" className="hidden sm:block">
-              <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold">Apply Now</Button>
-            </Link>
-            <div className="sm:hidden w-10" /> {/* Spacer for mobile */}
+            {/* Left: logo + mobile hamburger */}
+            <div className="flex items-center gap-2">
+              <button
+                className="md:hidden text-foreground hover:text-primary transition-colors p-2 -ml-2"
+                onClick={() => setIsOpen(!isOpen)}
+                aria-label="Toggle menu"
+              >
+                <Menu size={28} />
+              </button>
+
+              <Link href="/" className="flex items-center gap-3" aria-label="Go to home">
+                <Image
+                  src="/images/untitled-20-281024-20x-201128-20px-29.png"
+                  alt="RAW2RECRUITED Logo"
+                  width={56}
+                  height={62}
+                  className="h-12 md:h-14 w-auto"
+                  priority
+                />
+                <span className="hidden sm:block font-extrabold tracking-wide text-foreground">
+                  RAW2RECRUITED
+                </span>
+              </Link>
+            </div>
+
+            {/* Desktop navigation */}
+            <div className="hidden md:flex items-center gap-8">
+              <div className="relative" ref={desktopProgramsRef}>
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-foreground/90 hover:text-primary transition-colors"
+                  aria-haspopup="menu"
+                  aria-expanded={desktopProgramsOpen}
+                  onClick={() => setDesktopProgramsOpen((v) => !v)}
+                >
+                  Programs
+                  <ChevronDown size={16} className={`transition-transform ${desktopProgramsOpen ? "rotate-180" : ""}`} />
+                </button>
+
+                {desktopProgramsOpen && (
+                  <div
+                    role="menu"
+                    aria-label="Programs"
+                    className="absolute left-0 top-full mt-2 w-64 rounded-md border border-border bg-background shadow-lg overflow-hidden"
+                  >
+                    <Link
+                      href="/programs"
+                      role="menuitem"
+                      className="block px-4 py-3 text-sm text-foreground hover:bg-accent transition-colors"
+                      onClick={() => setDesktopProgramsOpen(false)}
+                    >
+                      All Programs
+                    </Link>
+                    <div className="h-px bg-border" />
+                    <Link
+                      href="/programs/esa"
+                      role="menuitem"
+                      className="block px-4 py-3 text-sm text-foreground hover:bg-accent transition-colors"
+                      onClick={() => setDesktopProgramsOpen(false)}
+                    >
+                      ESA / Homeschool PE
+                    </Link>
+                    <Link
+                      href="/programs/private-training"
+                      role="menuitem"
+                      className="block px-4 py-3 text-sm text-foreground hover:bg-accent transition-colors"
+                      onClick={() => setDesktopProgramsOpen(false)}
+                    >
+                      Private 1-on-1
+                    </Link>
+                    <Link
+                      href="/programs/clinics"
+                      role="menuitem"
+                      className="block px-4 py-3 text-sm text-foreground hover:bg-accent transition-colors"
+                      onClick={() => setDesktopProgramsOpen(false)}
+                    >
+                      Team Clinics
+                    </Link>
+                    <Link
+                      href="/programs/womens-flag-football"
+                      role="menuitem"
+                      className="block px-4 py-3 text-sm text-foreground hover:bg-accent transition-colors"
+                      onClick={() => setDesktopProgramsOpen(false)}
+                    >
+                      Women&apos;s Flag Football
+                    </Link>
+                  </div>
+                )}
+              </div>
+              <Link href="/coaches" className="text-sm font-semibold text-foreground/90 hover:text-primary transition-colors">
+                Coaches
+              </Link>
+              <Link href="/gallery" className="text-sm font-semibold text-foreground/90 hover:text-primary transition-colors">
+                Gallery
+              </Link>
+              <Link href="/contact" className="text-sm font-semibold text-foreground/90 hover:text-primary transition-colors">
+                Contact
+              </Link>
+            </div>
+
+            {/* Right: CTA */}
+            <div className="flex items-center gap-2">
+              <Link href="/contact" className="hidden sm:block">
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold">Apply Now</Button>
+              </Link>
+
+              <button
+                className="hidden sm:inline-flex md:hidden text-foreground hover:text-primary transition-colors p-2"
+                onClick={() => setIsOpen(!isOpen)}
+                aria-label="Open menu"
+              >
+                <Menu size={26} />
+              </button>
+
+              <div className="sm:hidden w-10" />
+            </div>
           </div>
         </div>
       </nav>
