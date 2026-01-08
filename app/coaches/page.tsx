@@ -18,7 +18,7 @@ const coaches = [
       "DB Techniques",
       "Catching Mechanics",
     ],
-    image: "/images/tmp9besqc5y.jpeg",
+    image: "/assests/coach.jpeg",
   },
   {
     name: "Daniel Cruz",
