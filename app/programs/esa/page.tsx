@@ -42,7 +42,7 @@ const pathwaySteps = [
 ]
 
 const thisIsFor = [
-  "4th grade+ athletes (ages 8+) ready to train like competitors",
+  "3rd grade+ athletes (ages 8+) ready to train like competitors",
   "High school athletes building toward varsity",
   "Homeschool families who want elite development, not just PE checkboxes",
   "Athletes with real goals: make a roster, earn a jersey, compete",
@@ -311,7 +311,7 @@ export default function ESAPage() {
                     required
                     className="bg-background border-border"
                   />
-                  <p className="text-xs text-muted-foreground">Eligibility: ages 8+ only (4th grade and above).</p>
+                  <p className="text-xs text-muted-foreground">Eligibility: ages 8+ only (3rd grade and above).</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="grade" className="text-foreground">
@@ -322,6 +322,7 @@ export default function ESAPage() {
                       <SelectValue placeholder="Select grade" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="3rd">3rd Grade</SelectItem>
                       <SelectItem value="4th">4th Grade</SelectItem>
                       <SelectItem value="5th">5th Grade</SelectItem>
                       <SelectItem value="6th">6th Grade</SelectItem>

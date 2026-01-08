@@ -214,7 +214,7 @@ export default function WomensFlagFootballPage() {
               </div>
               <ul className="space-y-4">
                 {[
-                  "You're 4th grade+ (ages 8+) and serious about development",
+                  "You're 3rd grade+ (ages 8+) and serious about development",
                   "You have college aspirations (scholarship or walk-on)",
                   "You want to compete, not just participate",
                   "You're willing to put in the work others won't",
@@ -335,7 +335,7 @@ export default function WomensFlagFootballPage() {
                           <SelectValue placeholder="Select grade" />
                         </SelectTrigger>
                         <SelectContent>
-                          {["4th Grade", "5th Grade", "6th Grade", "7th Grade", "8th Grade", "Freshman", "Sophomore", "Junior", "Senior"].map(
+                          {["3rd Grade", "4th Grade", "5th Grade", "6th Grade", "7th Grade", "8th Grade", "Freshman", "Sophomore", "Junior", "Senior"].map(
                             (grade) => (
                               <SelectItem key={grade} value={grade}>
                                 {grade}
@@ -346,7 +346,7 @@ export default function WomensFlagFootballPage() {
                       </Select>
                     </div>
                   </div>
-                  <p className="text-xs text-muted-foreground">Eligibility: ages 8+ only (4th grade and above).</p>
+                  <p className="text-xs text-muted-foreground">Eligibility: ages 8+ only (3rd grade and above).</p>
                   <div>
                     <Label htmlFor="school" className="text-foreground">
                       School *
