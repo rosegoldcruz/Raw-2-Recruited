@@ -7,7 +7,7 @@ const coaches = [
   {
     name: "Dylan Katzenburger",
     role: "Head Trainer - Speed & Skills",
-    image: "/images/tmp9besqc5y.jpeg",
+    image: "/assests/coach.jpeg",
   },
   {
     name: "Daniel Cruz",
