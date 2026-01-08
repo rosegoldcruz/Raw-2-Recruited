@@ -20,6 +20,13 @@ const coaches = [
     specialties: ["O-Line Technique", "Leverage & Footwork", "Run Blocking", "Pass Protection"],
     image: "/football-coach-male-athletic-portrait.jpg",
   },
+  {
+    name: "Jon Brown",
+    role: "Quarterback Coach",
+    bio: "Elite quarterback specialist focused on mechanics, footwork, and decision-making. Teaches QBs to read defenses, master pocket presence, and deliver accurate throws under pressure.",
+    specialties: ["QB Mechanics", "Pocket Presence", "Footwork", "Reading Defenses", "Accuracy"],
+    image: "/assests/Jon Brown.jpeg",
+  },
 ]
 
 export function CoachesSection() {

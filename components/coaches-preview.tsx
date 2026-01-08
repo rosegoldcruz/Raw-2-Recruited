@@ -19,6 +19,11 @@ const coaches = [
     role: "Defensive Line Specialist",
     image: "/images/image.png",
   },
+  {
+    name: "Jon Brown",
+    role: "Quarterback Coach",
+    image: "/assests/Jon Brown.jpeg",
+  },
 ]
 
 export function CoachesPreview() {
