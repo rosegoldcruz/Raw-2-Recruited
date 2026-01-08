@@ -61,9 +61,9 @@ export function FlatGallery() {
               {mediaItems.map((item, index) => (
                 <div
                   key={index}
-                  className="pl-4 min-w-[280px] sm:min-w-[320px] md:min-w-[400px] flex-[0_0_auto]"
+                  className="pl-4 flex-[0_0_100%] min-w-0"
                 >
-                  <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-border bg-card">
+                  <div className="max-w-sm mx-auto relative aspect-[9/16] rounded-2xl overflow-hidden border border-border bg-card">
                     {item.type === "image" ? (
                       <Image
                         src={item.src}
