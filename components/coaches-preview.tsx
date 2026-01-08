@@ -39,7 +39,7 @@ export function CoachesPreview() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-12">
+        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto mb-12">
           {coaches.map((coach, index) => (
             <div
               key={index}
@@ -51,7 +51,9 @@ export function CoachesPreview() {
                   src={coach.image || "/placeholder.svg"}
                   alt={coach.name}
                   fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  className={`object-cover group-hover:scale-105 transition-transform duration-500 ${
+                    coach.name === "Jon Brown" ? "object-top" : ""
+                  }`}
                 />
               </div>
               <div className="p-6 -mt-16 relative z-20">

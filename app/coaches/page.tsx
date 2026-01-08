@@ -48,6 +48,20 @@ const coaches = [
     ],
     image: "/images/image.png",
   },
+  {
+    name: "Jon Brown",
+    role: "Quarterback Coach",
+    bio: "Specializing in quarterback mechanics, footwork, and reading defenses. Jon helps quarterbacks develop arm strength, accuracy, and the mental processing speed needed to lead an offense. From pocket presence to throwing on the run, he covers all aspects of the modern QB game.",
+    specialties: [
+      "QB Mechanics",
+      "Footwork",
+      "Reading Defenses",
+      "Arm Strength",
+      "Accuracy",
+      "Pocket Presence",
+    ],
+    image: "/assests/Jon Brown.jpeg",
+  },
 ]
 
 export default function CoachesPage() {
