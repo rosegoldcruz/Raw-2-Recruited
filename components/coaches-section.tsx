@@ -38,7 +38,7 @@ export function CoachesSection() {
             MEET YOUR <span className="text-primary">COACHES</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-            Former College & Semi-Pro athletes who've been in the trenches and know what it takes.
+            Former NFL, UFL, IFL, and College athletes who've been in the trenches and know what it takes.
           </p>
         </div>
 

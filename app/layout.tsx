@@ -10,7 +10,7 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] })
 export const metadata: Metadata = {
   title: "RAW2RECRUITED | Elite Football Training - Arizona",
   description:
-    "Elite football training for Homeschool & ESA students in West Valley, Arizona. Earn PE credits while getting college ready. Led by former College & Semi-Pro athletes.",
+    "Elite football training for Homeschool & ESA students in West Valley, Arizona. Earn PE credits while getting college ready. Led by former NFL, UFL, IFL, and College athletes.",
   keywords: [
     "football training",
     "youth athletics",

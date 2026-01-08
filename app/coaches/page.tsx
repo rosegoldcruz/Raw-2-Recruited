@@ -11,6 +11,7 @@ const coaches = [
     role: "Head Trainer - Speed & Skills",
     bio: "Speed and agility expert focusing on the nuances of skill positions. Dylan develops explosive athletes with elite route-running, catching, and defensive back techniques. His training philosophy centers on footwork, body control, and reading defenses to give athletes an edge on game day.",
     specialties: [
+      "Wide Receiver Specialist",
       "Speed Training",
       "Agility Drills",
       "Route Running",
@@ -72,7 +73,7 @@ export default function CoachesPage() {
       <PageHero
         title="MEET YOUR"
         highlight="COACHES"
-        description="Former College & Semi-Pro athletes who've been in the trenches and know what it takes."
+        description="Former NFL, UFL, IFL, and College athletes who've been in the trenches and know what it takes."
       />
 
       <section className="py-16">

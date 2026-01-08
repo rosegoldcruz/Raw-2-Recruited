@@ -11,7 +11,7 @@ const props = [
     icon: Target,
     title: "Pro-Level Technique",
     description:
-      "Learn from former college and semi-pro athletes who teach real fundamentals — footwork, leverage, positioning, and game-ready mechanics that translate under pressure.",
+      "Learn from former NFL, UFL, IFL, and college athletes who teach real fundamentals — footwork, leverage, positioning, and game-ready mechanics that translate under pressure.",
   },
   {
     icon: Brain,
