@@ -2,7 +2,7 @@
 
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
-import { CircularGallery } from "@/components/circular-gallery"
+import { FlatGallery } from "@/components/flat-gallery"
 import { PageHero } from "@/components/page-hero"
 
 export default function GalleryPage() {
@@ -14,7 +14,7 @@ export default function GalleryPage() {
         highlight="WORK"
         description="See our athletes in action. Real training, real results."
       />
-      <CircularGallery />
+      <FlatGallery />
       <Footer />
     </main>
   )
