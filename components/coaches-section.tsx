@@ -7,18 +7,18 @@ import { CardBody, CardContainer, CardItem } from "@/components/ui/3d-card"
 
 const coaches = [
   {
+    name: "Dylan Katzenburger",
+    role: "Head Trainer - Speed & Skills",
+    bio: "Speed and agility expert focusing on the nuances of skill positions. Develops explosive athletes with elite route-running, catching, and defensive back techniques.",
+    specialties: ["Speed Training", "Agility Drills", "Route Running", "Position Work"],
+    image: "/assests/coach.jpeg",
+  },
+  {
     name: "Daniel Cruz",
     role: "Offensive Line Specialist",
     bio: "Former college O-lineman specializing in technique, leverage, and the tricks of the trade. Teaches linemen how to outsmart bigger opponents through footwork and positioning.",
     specialties: ["O-Line Technique", "Leverage & Footwork", "Run Blocking", "Pass Protection"],
     image: "/football-coach-male-athletic-portrait.jpg",
-  },
-  {
-    name: "Dylan",
-    role: "Head Trainer - Speed & Skills",
-    bio: "Speed and agility expert focusing on the nuances of skill positions. Develops explosive athletes with elite route-running, catching, and defensive back techniques.",
-    specialties: ["Speed Training", "Agility Drills", "Route Running", "Position Work"],
-    image: "/assests/coach.jpeg",
   },
 ]
 
