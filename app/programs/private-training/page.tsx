@@ -346,7 +346,7 @@ export default function PrivateTrainingPage() {
                       required
                       className="bg-card border-border"
                     />
-                    <p className="mt-2 text-xs text-muted-foreground">Eligibility: ages 8+ only (6th grade and above).</p>
+                    <p className="mt-2 text-xs text-muted-foreground">Eligibility: ages 8+ only (4th grade and above).</p>
                   </div>
                 </div>
 

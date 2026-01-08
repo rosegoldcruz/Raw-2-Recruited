@@ -32,7 +32,7 @@ const coaches = [
       "Hand Fighting",
       "Mental Game",
     ],
-    image: "/images/daniel-cruz.jpg",
+    image: "/assests/Coach Cruz.jpeg",
   },
   {
     name: "Carson Taylor",

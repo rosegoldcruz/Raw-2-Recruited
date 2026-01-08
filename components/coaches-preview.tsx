@@ -12,7 +12,7 @@ const coaches = [
   {
     name: "Daniel Cruz",
     role: "Offensive Line Specialist",
-    image: "/images/daniel-cruz.jpg",
+    image: "/assests/Coach Cruz.jpeg",
   },
   {
     name: "Carson Taylor",
