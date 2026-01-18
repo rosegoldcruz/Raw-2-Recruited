@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Menu, X, ChevronRight, ChevronDown, Home, Layers, Users, ImageIcon, Phone } from "lucide-react"
+import { Menu, X, ChevronRight, ChevronDown, Home, Layers, Users, ImageIcon, Phone, Flag } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ClubAnnouncement } from "@/components/club-announcement"
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -45,6 +46,7 @@ export function Navbar() {
 
   return (
     <>
+      <ClubAnnouncement />
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 md:h-20">
@@ -75,6 +77,12 @@ export function Navbar() {
 
             {/* Desktop navigation */}
             <div className="hidden md:flex items-center gap-8">
+              <Link
+                href="/programs/womens-flag-football/west-valley"
+                className="text-sm font-semibold text-foreground/90 hover:text-primary transition-colors"
+              >
+                Club Team
+              </Link>
               <div className="relative" ref={desktopProgramsRef}>
                 <button
                   type="button"
@@ -103,6 +111,14 @@ export function Navbar() {
                     </Link>
                     <div className="h-px bg-border" />
                     <Link
+                      href="/programs/womens-flag-football/west-valley"
+                      role="menuitem"
+                      className="block px-4 py-3 text-sm text-foreground hover:bg-accent transition-colors"
+                      onClick={() => setDesktopProgramsOpen(false)}
+                    >
+                      2Raw West Valley Club
+                    </Link>
+                    <Link
                       href="/programs/womens-flag-football"
                       role="menuitem"
                       className="block px-4 py-3 text-sm text-foreground hover:bg-accent transition-colors"
@@ -125,6 +141,14 @@ export function Navbar() {
                       onClick={() => setDesktopProgramsOpen(false)}
                     >
                       Team Clinics
+                    </Link>
+                    <Link
+                      href="/programs/recruiting-services"
+                      role="menuitem"
+                      className="block px-4 py-3 text-sm text-foreground hover:bg-accent transition-colors"
+                      onClick={() => setDesktopProgramsOpen(false)}
+                    >
+                      Recruiting Services
                     </Link>
                     <Link
                       href="/programs/esa"
@@ -203,6 +227,14 @@ export function Navbar() {
             <Home size={22} />
             Home
           </Link>
+              <Link
+                href="/programs/womens-flag-football/west-valley"
+                className="flex items-center gap-4 px-6 py-4 text-foreground hover:text-primary hover:bg-accent transition-colors font-medium text-lg"
+                onClick={closeNav}
+              >
+                <Flag size={22} />
+                Club Team
+              </Link>
 
           {/* Programs section with expandable sub-menu */}
           <div>
@@ -230,6 +262,13 @@ export function Navbar() {
                 All Programs
               </Link>
               <Link
+                href="/programs/womens-flag-football/west-valley"
+                className="block pl-16 pr-6 py-3 text-muted-foreground hover:text-primary hover:bg-accent transition-colors"
+                onClick={closeNav}
+              >
+                2Raw West Valley Club
+              </Link>
+              <Link
                 href="/programs/womens-flag-football"
                 className="block pl-16 pr-6 py-3 text-muted-foreground hover:text-primary hover:bg-accent transition-colors"
                 onClick={closeNav}
@@ -249,6 +288,13 @@ export function Navbar() {
                 onClick={closeNav}
               >
                 Team Clinics
+              </Link>
+              <Link
+                href="/programs/recruiting-services"
+                className="block pl-16 pr-6 py-3 text-muted-foreground hover:text-primary hover:bg-accent transition-colors"
+                onClick={closeNav}
+              >
+                Recruiting Services
               </Link>
               <Link
                 href="/programs/esa"

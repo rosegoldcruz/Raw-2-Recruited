@@ -144,6 +144,9 @@ export function ContactForm() {
             <SelectValue placeholder="Select a program" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="2raw-club">2Raw Club Team (West Valley)</SelectItem>
+            <SelectItem value="womens-flag">Women's Flag Football Training</SelectItem>
+            <SelectItem value="recruiting">Recruiting Services</SelectItem>
             <SelectItem value="pe-credits">The Credit Program (PE Credits)</SelectItem>
             <SelectItem value="team-clinics">Team Clinics</SelectItem>
             <SelectItem value="elite-1on1">Elite 1-on-1 Training</SelectItem>

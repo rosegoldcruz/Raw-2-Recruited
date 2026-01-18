@@ -2,9 +2,23 @@ import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { PageHero } from "@/components/page-hero"
 import { ProgramCard } from "@/components/program-card"
-import { GraduationCap, Crown, Users, Flag } from "lucide-react"
+import { GraduationCap, Crown, Users, Flag, Trophy, Mail } from "lucide-react"
 
 const programs = [
+  {
+    title: "2Raw West Valley Club",
+    description:
+      "Girls flag football club representing Tolleson, Laveen, Avondale, Surprise, and Buckeye with a college scholarship pipeline.",
+    href: "/programs/womens-flag-football/west-valley",
+    icon: Trophy,
+  },
+  {
+    title: "Recruiting Services & Film Review",
+    description:
+      "Hands-on film rebuilds and targeted outreach to NAIA, D3, D2, and D1 staffs with clear follow-up support.",
+    href: "/programs/recruiting-services",
+    icon: Mail,
+  },
   {
     title: "Women's Flag Football",
     description:
