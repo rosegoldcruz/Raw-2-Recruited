@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import UAParser from 'ua-parser-js';
+import { UAParser } from 'ua-parser-js';
 
 export function hashIP(ip: string): string {
   return crypto.createHash('sha256').update(ip + process.env.HASH_SALT || 'default-salt').digest('hex');
