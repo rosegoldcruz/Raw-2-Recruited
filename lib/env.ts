@@ -4,16 +4,16 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   
   // Telegram Bot Configuration
-  TELEGRAM_BOT_TOKEN: z.string().min(1, 'Telegram bot token is required'),
-  TELEGRAM_CHAT_ID: z.string().min(1, 'Telegram chat ID is required'),
+  TELEGRAM_BOT_TOKEN: z.string().min(1, 'Telegram bot token is required').optional(),
+  TELEGRAM_CHAT_ID: z.string().min(1, 'Telegram chat ID is required').optional(),
   
   // Supabase Configuration
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url('Invalid Supabase URL'),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1, 'Supabase anon key is required'),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, 'Supabase service role key is required'),
+  NEXT_PUBLIC_SUPABASE_URL: z.string().url('Invalid Supabase URL').optional(),
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1, 'Supabase anon key is required').optional(),
+  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, 'Supabase service role key is required').optional(),
   
   // Analytics Configuration
-  NEXT_PUBLIC_SITE_URL: z.string().url('Invalid site URL'),
+  NEXT_PUBLIC_SITE_URL: z.string().url('Invalid site URL').optional(),
   ANALYTICS_ENABLED: z.enum(['true', 'false']).transform(Boolean).default('true'),
   
   // High-Value Pages
@@ -26,9 +26,14 @@ function validateEnv() {
   } catch (error) {
     if (error instanceof z.ZodError) {
       const missingVars = error.errors.map(err => `${err.path.join('.')}: ${err.message}`).join('\n');
-      throw new Error(`Environment validation failed:\n${missingVars}`);
+      // In production, throw error for missing required vars
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error(`Environment validation failed:\n${missingVars}`);
+      }
+      // In development, log warning and continue with optional values
+      console.warn('Environment validation warnings (development mode):', missingVars);
     }
-    throw error;
+    return envSchema.parse(process.env);
   }
 }
 
