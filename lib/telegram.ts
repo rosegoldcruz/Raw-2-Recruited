@@ -8,8 +8,8 @@ interface TelegramMessage {
 }
 
 class TelegramBot {
-  private botToken: string;
-  private chatId: string;
+  private botToken: string | undefined;
+  private chatId: string | undefined;
 
   constructor() {
     this.botToken = env.TELEGRAM_BOT_TOKEN;
@@ -17,6 +17,11 @@ class TelegramBot {
   }
 
   private async sendMessage(message: TelegramMessage): Promise<boolean> {
+    if (!this.botToken || !this.chatId) {
+      console.warn('Telegram credentials not configured, skipping notification');
+      return false;
+    }
+
     try {
       const url = `https://api.telegram.org/bot${this.botToken}/sendMessage`;
       
@@ -87,7 +92,7 @@ class TelegramBot {
   async sendHighValuePageNotification(pageView: PageView): Promise<boolean> {
     let message = `🚨 *High-Value Page Visit*\n\n`;
     message += `📄 *Page:* ${pageView.title || pageView.path}\n`;
-    message += `🔗 *URL:* ${env.NEXT_PUBLIC_SITE_URL}${pageView.path}\n`;
+    message += `🔗 *URL:* ${env.NEXT_PUBLIC_SITE_URL || 'https://your-domain.com'}${pageView.path}\n`;
     
     if (pageView.device_type) {
       const deviceEmoji = pageView.device_type === 'mobile' ? '📱' : 
@@ -165,6 +170,11 @@ class TelegramBot {
   }
 
   async testConnection(): Promise<boolean> {
+    if (!this.botToken || !this.chatId) {
+      console.warn('Telegram credentials not configured');
+      return false;
+    }
+
     return this.sendMessage({
       text: '🤖 *Bot Test*\n\nTelegram bot is successfully connected and ready to send notifications!',
       parse_mode: 'Markdown',
