@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
 import { 
   sanitizeInput, 
   validateEmail, 
@@ -9,7 +8,6 @@ import {
   hashVisitorData
 } from '@/lib/analytics-utils';
 import { sendLeadNotificationAsync } from '@/lib/telegram';
-import type { Lead } from '@/lib/supabase';
 
 export const runtime = "nodejs"
 
@@ -73,7 +71,7 @@ export async function POST(request: NextRequest) {
     const finalVisitorHash = visitor_hash || hashVisitorData(ip, userAgent);
 
     // Sanitize input data
-    const sanitizedLead: Partial<Lead> = {
+    const leadData = {
       name: sanitizeInput(name),
       phone: phone ? sanitizeInput(phone) : undefined,
       email: email ? sanitizeInput(email.toLowerCase()) : undefined,
@@ -87,34 +85,17 @@ export async function POST(request: NextRequest) {
       utm_campaign: utmData.utm_campaign,
       referrer: utmData.referrer,
       status: 'new',
+      created_at: new Date().toISOString(),
     };
 
-    // Insert lead into database
-    const { data: leadData, error: dbError } = await supabase
-      .from('leads')
-      .insert(sanitizedLead)
-      .select()
-      .single();
-
-    if (dbError) {
-      console.error('Database error:', dbError);
-      return NextResponse.json(
-        { error: 'Failed to save lead' },
-        { status: 500 }
-      );
-    }
-
     // Send Telegram notification asynchronously (non-blocking)
-    if (leadData) {
-      sendLeadNotificationAsync(leadData);
-    }
+    sendLeadNotificationAsync(leadData);
 
     return NextResponse.json({ 
       success: true, 
       lead: {
-        id: leadData.id,
         name: leadData.name,
-        status: leadData.status,
+        status: 'sent',
         created_at: leadData.created_at,
       }
     });

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,71 +14,7 @@ export async function POST(request: NextRequest) {
         success: true,
         test: 'telegram',
         result: success,
-        message: success ? 'Telegram bot is working!' : 'Telegram bot test failed'
-      });
-    }
-
-    if (action === 'test-database') {
-      // Test database connection
-      const { data, error } = await supabase
-        .from('page_views')
-        .select('count')
-        .limit(1);
-
-      if (error) {
-        return NextResponse.json({
-          success: false,
-          test: 'database',
-          error: error.message
-        }, { status: 500 });
-      }
-
-      return NextResponse.json({
-        success: true,
-        test: 'database',
-        result: true,
-        message: 'Database connection is working!'
-      });
-    }
-
-    if (action === 'test-analytics') {
-      // Test analytics tracking
-      const testPageView = {
-        visitor_hash: 'test-hash-12345',
-        path: '/test',
-        title: 'Test Page',
-        referrer: 'direct',
-        user_agent: 'Test Agent',
-        device_type: 'desktop',
-        browser: 'Test Browser',
-        os: 'Test OS',
-        ip_hash: 'test-ip-hash',
-        session_id: 'test-session',
-      };
-
-      const { error } = await supabase
-        .from('page_views')
-        .insert(testPageView);
-
-      if (error) {
-        return NextResponse.json({
-          success: false,
-          test: 'analytics',
-          error: error.message
-        }, { status: 500 });
-      }
-
-      // Clean up test data
-      await supabase
-        .from('page_views')
-        .delete()
-        .eq('visitor_hash', 'test-hash-12345');
-
-      return NextResponse.json({
-        success: true,
-        test: 'analytics',
-        result: true,
-        message: 'Analytics tracking is working!'
+        message: success ? 'Telegram bot is working!' : 'Telegram bot test failed - configure credentials'
       });
     }
 
