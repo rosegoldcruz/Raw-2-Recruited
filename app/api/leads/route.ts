@@ -1,115 +1,229 @@
-import { NextResponse } from "next/server"
-
-type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue }
-
-type LeadPayload = Record<string, JsonValue>
-
-function safeStringify(value: unknown): string {
-  try {
-    return JSON.stringify(value, null, 2)
-  } catch {
-    return String(value)
-  }
-}
-
-async function sendTelegramMessage(text: string): Promise<boolean> {
-  const token = process.env.DYLAN_TELEGRAM_BOT_TOKEN
-  const chatId = process.env.DYLAN_CHAT_ID
-
-  console.log("[Telegram] Attempting to send message", {
-    hasToken: !!token,
-    hasChatId: !!chatId,
-    messageLength: text.length,
-  })
-
-  if (!token || !chatId) {
-    console.error("[Telegram] CRITICAL: Missing environment variables", {
-      DYLAN_TELEGRAM_BOT_TOKEN: token ? "SET" : "MISSING",
-      DYLAN_CHAT_ID: chatId ? "SET" : "MISSING",
-    })
-    return false
-  }
-
-  try {
-    const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text,
-      }),
-    })
-
-    const responseBody = await response.text()
-
-    if (!response.ok) {
-      console.error("[Telegram] sendMessage failed", {
-        status: response.status,
-        statusText: response.statusText,
-        body: responseBody,
-      })
-      return false
-    }
-
-    console.log("[Telegram] Message sent successfully", {
-      status: response.status,
-      response: responseBody.substring(0, 200),
-    })
-    return true
-  } catch (error) {
-    console.error("[Telegram] sendMessage error", error)
-    return false
-  }
-}
+import { NextRequest, NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabase';
+import { 
+  sanitizeInput, 
+  validateEmail, 
+  validatePhone,
+  extractUTMParameters,
+  hashIP,
+  hashVisitorData
+} from '@/lib/analytics-utils';
+import { sendLeadNotificationAsync } from '@/lib/telegram';
+import type { Lead } from '@/lib/supabase';
 
 export const runtime = "nodejs"
 
-export async function POST(request: Request) {
-  console.log("[API /api/leads] Received POST request")
-
-  let payload: LeadPayload | null = null
-
+export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
-    if (body && typeof body === "object" && !Array.isArray(body)) {
-      payload = body as LeadPayload
-    } else {
-      payload = { payload: body as JsonValue }
+    const body = await request.json();
+    const {
+      name,
+      phone,
+      email,
+      service_requested,
+      message,
+      lead_type = 'general',
+      source = 'Website Contact Form',
+      visitor_hash,
+    } = body;
+
+    // Validate required fields
+    if (!name || !name.trim()) {
+      return NextResponse.json(
+        { error: 'Name is required' },
+        { status: 400 }
+      );
     }
-  } catch {
-    console.error("[API /api/leads] Invalid JSON in request body")
-    return NextResponse.json({ ok: false, error: "Invalid JSON" }, { status: 400 })
-  }
 
-  console.log("[API /api/leads] Parsed payload", {
-    source: payload?.source || "unknown",
-    hasData: !!payload,
-  })
+    if (!phone && !email) {
+      return NextResponse.json(
+        { error: 'Either phone or email is required' },
+        { status: 400 }
+      );
+    }
 
-  const meta = {
-    receivedAt: new Date().toISOString(),
-    referer: request.headers.get("referer"),
-    userAgent: request.headers.get("user-agent"),
-  }
+    // Validate email format if provided
+    if (email && !validateEmail(email)) {
+      return NextResponse.json(
+        { error: 'Invalid email format' },
+        { status: 400 }
+      );
+    }
 
-  const message = `🔥 New Lead\n${safeStringify({ ...meta, ...payload })}`
+    // Validate phone format if provided
+    if (phone && !validatePhone(phone)) {
+      return NextResponse.json(
+        { error: 'Invalid phone format' },
+        { status: 400 }
+      );
+    }
 
-  // Send to Telegram and wait for result
-  const sent = await sendTelegramMessage(message)
+    // Get client IP for visitor tracking
+    const forwarded = request.headers.get('x-forwarded-for');
+    const ip = forwarded ? forwarded.split(',')[0] : 
+                request.headers.get('x-real-ip') || 
+                request.ip || 
+                'unknown';
 
-  if (!sent) {
-    console.error("[API /api/leads] FAILED to send Telegram message - returning error to client")
+    // Extract UTM parameters
+    const utmData = extractUTMParameters(request.url);
+
+    // Get or generate visitor hash
+    const userAgent = request.headers.get('user-agent') || '';
+    const finalVisitorHash = visitor_hash || hashVisitorData(ip, userAgent);
+
+    // Sanitize input data
+    const sanitizedLead: Partial<Lead> = {
+      name: sanitizeInput(name),
+      phone: phone ? sanitizeInput(phone) : undefined,
+      email: email ? sanitizeInput(email.toLowerCase()) : undefined,
+      service_requested: service_requested ? sanitizeInput(service_requested) : undefined,
+      message: message ? sanitizeInput(message) : undefined,
+      lead_type: lead_type as 'quote' | 'general' | 'inquiry',
+      source: sanitizeInput(source),
+      visitor_hash: finalVisitorHash,
+      utm_source: utmData.utm_source,
+      utm_medium: utmData.utm_medium,
+      utm_campaign: utmData.utm_campaign,
+      referrer: utmData.referrer,
+      status: 'new',
+    };
+
+    // Insert lead into database
+    const { data: leadData, error: dbError } = await supabase
+      .from('leads')
+      .insert(sanitizedLead)
+      .select()
+      .single();
+
+    if (dbError) {
+      console.error('Database error:', dbError);
+      return NextResponse.json(
+        { error: 'Failed to save lead' },
+        { status: 500 }
+      );
+    }
+
+    // Send Telegram notification asynchronously (non-blocking)
+    if (leadData) {
+      sendLeadNotificationAsync(leadData);
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      lead: {
+        id: leadData.id,
+        name: leadData.name,
+        status: leadData.status,
+        created_at: leadData.created_at,
+      }
+    });
+
+  } catch (error) {
+    console.error('Lead creation error:', error);
     return NextResponse.json(
-      {
-        ok: false,
-        error: "Failed to send notification. Please contact support or try again.",
-      },
+      { error: 'Internal server error' },
       { status: 500 }
-    )
+    );
   }
+}
 
-  console.log("[API /api/leads] Successfully sent to Telegram, returning success")
-  return NextResponse.json({ ok: true })
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get('status');
+    const lead_type = searchParams.get('lead_type');
+    const limit = parseInt(searchParams.get('limit') || '50');
+    const offset = parseInt(searchParams.get('offset') || '0');
+
+    let query = supabase
+      .from('leads')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (status) {
+      query = query.eq('status', status);
+    }
+
+    if (lead_type) {
+      query = query.eq('lead_type', lead_type);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Database error:', error);
+      return NextResponse.json(
+        { error: 'Failed to fetch leads' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      data: data || [],
+      total: data?.length || 0
+    });
+
+  } catch (error) {
+    console.error('Leads fetch error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { id, status, notes } = body;
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Lead ID is required' },
+        { status: 400 }
+      );
+    }
+
+    const updateData: Partial<Lead> = {
+      updated_at: new Date().toISOString(),
+    };
+
+    if (status) {
+      updateData.status = status as 'new' | 'contacted' | 'converted' | 'closed';
+    }
+
+    if (notes !== undefined) {
+      updateData.notes = notes;
+    }
+
+    const { data: leadData, error } = await supabase
+      .from('leads')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Database error:', error);
+      return NextResponse.json(
+        { error: 'Failed to update lead' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      lead: leadData
+    });
+
+  } catch (error) {
+    console.error('Lead update error:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
 }

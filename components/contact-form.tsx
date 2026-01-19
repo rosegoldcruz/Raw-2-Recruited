@@ -10,41 +10,27 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { CheckCircle2, Loader2 } from "lucide-react"
+import { useLeadForm } from "@/hooks/use-lead-form"
 
 export function ContactForm() {
   const router = useRouter()
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  const { formData, isSubmitting, error, success, updateField, submitLead } = useLeadForm({
+    lead_type: 'quote',
+    source: 'Contact Page Form'
+  })
   const [program, setProgram] = useState("")
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    setIsSubmitting(true)
-
-    try {
-      const rawEntries = Array.from(new FormData(e.currentTarget).entries())
-      const payload = Object.fromEntries(rawEntries)
-
-      await fetch("/api/leads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          source: "contact",
-          ...payload,
-          program: program || (payload.program as string | undefined) || "",
-        }),
-      })
-
+    
+    await submitLead()
+    
+    if (success) {
       router.push("/thank-you")
-    } catch (err) {
-      console.error("Lead submission failed", err)
-      alert("Submission failed. Please try again.")
-    } finally {
-      setIsSubmitting(false)
     }
   }
 
-  if (isSubmitted) {
+  if (success) {
     return (
       <div className="bg-card border border-border rounded-2xl p-8 text-center">
         <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -60,50 +46,26 @@ export function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-8 space-y-6">
+      {error && (
+        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+          <p className="text-destructive text-sm">{error}</p>
+        </div>
+      )}
+
       <div className="grid sm:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="parentName" className="text-foreground">
+          <Label htmlFor="name" className="text-foreground">
             Parent/Guardian Name
           </Label>
           <Input
-            id="parentName"
-            name="parentName"
+            id="name"
+            name="name"
             placeholder="Your name"
+            value={formData.name}
+            onChange={(e) => updateField('name', e.target.value)}
             required
             className="bg-background border-border text-foreground"
           />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="athleteName" className="text-foreground">
-            Athlete Name
-          </Label>
-          <Input
-            id="athleteName"
-            name="athleteName"
-            placeholder="Athlete's name"
-            required
-            className="bg-background border-border text-foreground"
-          />
-        </div>
-      </div>
-
-      <div className="grid sm:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label htmlFor="athleteAge" className="text-foreground">
-            Athlete Age
-          </Label>
-          <Input
-            id="athleteAge"
-            name="athleteAge"
-            type="number"
-            placeholder="Age"
-            min="8"
-            max="25"
-            required
-            className="bg-background border-border text-foreground"
-          />
-          <p className="text-xs text-muted-foreground">Eligibility: ages 8+ only (6th grade and above).</p>
         </div>
 
         <div className="space-y-2">
@@ -114,8 +76,9 @@ export function ContactForm() {
             id="phone"
             name="phone"
             type="tel"
-            placeholder="(555) 123-4567"
-            required
+            placeholder="(602) 555-0123"
+            value={formData.phone}
+            onChange={(e) => updateField('phone', e.target.value)}
             className="bg-background border-border text-foreground"
           />
         </div>
@@ -130,42 +93,47 @@ export function ContactForm() {
           name="email"
           type="email"
           placeholder="your@email.com"
-          required
+          value={formData.email}
+          onChange={(e) => updateField('email', e.target.value)}
           className="bg-background border-border text-foreground"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="program" className="text-foreground">
+        <Label htmlFor="service_requested" className="text-foreground">
           Program Interest
         </Label>
-        <Select name="program" value={program} onValueChange={setProgram} required>
+        <Select value={program} onValueChange={(value) => {
+          setProgram(value)
+          updateField('service_requested', value)
+        }}>
           <SelectTrigger className="bg-background border-border text-foreground">
             <SelectValue placeholder="Select a program" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="2raw-club">2Raw Club Team (West Valley)</SelectItem>
-            <SelectItem value="womens-flag">Women's Flag Football Training</SelectItem>
-            <SelectItem value="recruiting">Recruiting Services</SelectItem>
-            <SelectItem value="pe-credits">The Credit Program (PE Credits)</SelectItem>
-            <SelectItem value="team-clinics">Team Clinics</SelectItem>
-            <SelectItem value="elite-1on1">Elite 1-on-1 Training</SelectItem>
-            <SelectItem value="speed-agility">Speed & Agility Training</SelectItem>
-            <SelectItem value="oline">Offensive Line Training</SelectItem>
-            <SelectItem value="other">Other / Not Sure</SelectItem>
+            <SelectItem value="Homeschool PE">Homeschool PE</SelectItem>
+            <SelectItem value="ESA Training">ESA Training</SelectItem>
+            <SelectItem value="1-on-1 Coaching">1-on-1 Coaching</SelectItem>
+            <SelectItem value="Group Training">Group Training</SelectItem>
+            <SelectItem value="Speed & Agility">Speed & Agility</SelectItem>
+            <SelectItem value="Strength Training">Strength Training</SelectItem>
+            <SelectItem value="Position Training">Position Training</SelectItem>
+            <SelectItem value="Combine Prep">Combine Prep</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div className="space-y-2">
         <Label htmlFor="message" className="text-foreground">
-          Additional Information (Optional)
+          Additional Information
         </Label>
         <Textarea
           id="message"
           name="message"
-          placeholder="Tell us about your athlete's experience, goals, or any questions you have..."
+          placeholder="Tell us about your athlete's goals, experience level, and any questions you have..."
           rows={4}
+          value={formData.message}
+          onChange={(e) => updateField('message', e.target.value)}
           className="bg-background border-border text-foreground resize-none"
         />
       </div>
@@ -173,15 +141,15 @@ export function ContactForm() {
       <Button
         type="submit"
         disabled={isSubmitting}
-        className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-6 text-lg"
+        className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
       >
         {isSubmitting ? (
           <>
-            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Submitting...
           </>
         ) : (
-          "Submit Enrollment Request"
+          "Secure Your Spot"
         )}
       </Button>
     </form>
