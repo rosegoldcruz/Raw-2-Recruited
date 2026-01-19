@@ -52,7 +52,7 @@ export function ClubAnnouncement() {
           </div>
 
           <h2 className="text-2xl sm:text-3xl font-black text-foreground leading-tight">
-            Founding roster now forming for our girls flag football club.
+            Founding Roster Now Forming For Our Girls Flag Football Club.
           </h2>
           <p className="text-muted-foreground leading-relaxed">
             Tolleson, Laveen, Avondale, Surprise, and Buckeye athletes get first-mover access. Limited spots, college-ready path, and a scholarship-focused build from day one.
