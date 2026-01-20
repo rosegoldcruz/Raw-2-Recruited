@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Menu, X, ChevronRight, ChevronDown, Home, Layers, Users, ImageIcon, Phone, Flag } from "lucide-react"
+import { Menu, X, ChevronRight, ChevronDown, Home, Layers, Users, ImageIcon, Phone, Flag, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ClubAnnouncement } from "@/components/club-announcement"
 
@@ -87,8 +87,8 @@ export function Navbar() {
                 <button
                   type="button"
                   className="inline-flex items-center gap-2 text-sm font-semibold text-foreground/90 hover:text-primary transition-colors"
-                  aria-haspopup="menu"
-                  aria-expanded={desktopProgramsOpen}
+                  aria-haspopup="true"
+                  aria-expanded={desktopProgramsOpen ? "true" : "false"}
                   onClick={() => setDesktopProgramsOpen((v) => !v)}
                 >
                   Programs
@@ -98,7 +98,7 @@ export function Navbar() {
                 {desktopProgramsOpen && (
                   <div
                     role="menu"
-                    aria-label="Programs"
+                    aria-label="Programs submenu"
                     className="absolute left-0 top-full mt-2 w-64 rounded-md border border-border bg-background shadow-lg overflow-hidden"
                   >
                     <Link
@@ -109,7 +109,7 @@ export function Navbar() {
                     >
                       All Programs
                     </Link>
-                    <div className="h-px bg-border" />
+                    <div role="separator" className="h-px bg-border" />
                     <Link
                       href="/programs/womens-flag-football/west-valley"
                       role="menuitem"
@@ -166,6 +166,9 @@ export function Navbar() {
               </Link>
               <Link href="/gallery" className="text-sm font-semibold text-foreground/90 hover:text-primary transition-colors">
                 Gallery
+              </Link>
+              <Link href="/reviews" className="text-sm font-semibold text-foreground/90 hover:text-primary transition-colors">
+                Reviews
               </Link>
               <Link href="/contact" className="text-sm font-semibold text-foreground/90 hover:text-primary transition-colors">
                 Contact
@@ -322,6 +325,15 @@ export function Navbar() {
           >
             <ImageIcon size={22} />
             Gallery
+          </Link>
+
+          <Link
+            href="/reviews"
+            className="flex items-center gap-4 px-6 py-4 text-foreground hover:text-primary hover:bg-accent transition-colors font-medium text-lg"
+            onClick={closeNav}
+          >
+            <Star size={22} />
+            Reviews
           </Link>
 
           <Link

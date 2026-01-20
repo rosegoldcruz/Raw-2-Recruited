@@ -16,8 +16,8 @@ export function parseUserAgent(userAgent: string) {
   
   return {
     device_type: result.device.type || 'desktop',
-    browser: result.browser.name || 'Unknown',
-    os: result.os.name || 'Unknown',
+    browser_name: result.browser.name || 'Unknown',
+    os_name: result.os.name || 'Unknown',
     device: {
       type: result.device.type || 'desktop',
       vendor: result.device.vendor,

@@ -1,5 +1,33 @@
 import { env } from './env';
-import type { Lead, PageView } from './supabase';
+
+// Lead type definition (matches API schema)
+interface Lead {
+  name: string;
+  phone?: string;
+  email?: string;
+  service_requested?: string;
+  message?: string;
+  lead_type?: 'quote' | 'general' | 'inquiry';
+  source?: string;
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  status?: string;
+  created_at?: string;
+}
+
+// PageView type definition
+interface PageView {
+  path: string;
+  title?: string;
+  device_type?: string;
+  referrer?: string;
+  utm_source?: string;
+  browser?: string;
+  country?: string;
+  city?: string;
+  visitor_hash?: string;
+}
 
 interface TelegramMessage {
   text: string;
@@ -113,7 +141,9 @@ class TelegramBot {
     }
     
     message += `⏰ *Time:* ${new Date().toLocaleString()}\n`;
-    message += `🆔 *Visitor:* ${pageView.visitor_hash.substring(0, 8)}...`;
+    if (pageView.visitor_hash) {
+      message += `🆔 *Visitor:* ${pageView.visitor_hash.substring(0, 8)}...`;
+    }
 
     return this.sendMessage({
       text: message,

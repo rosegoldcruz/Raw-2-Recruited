@@ -4,12 +4,31 @@ import {
   validateEmail, 
   validatePhone,
   extractUTMParameters,
-  hashIP,
   hashVisitorData
 } from '@/lib/analytics-utils';
 import { sendLeadNotificationAsync } from '@/lib/telegram';
 
 export const runtime = "nodejs"
+
+// Lead type definition
+interface Lead {
+  name: string;
+  phone?: string;
+  email?: string;
+  service_requested?: string;
+  message?: string;
+  lead_type: 'quote' | 'general' | 'inquiry';
+  source: string;
+  visitor_hash?: string;
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  referrer?: string;
+  status: string;
+  notes?: string;
+  created_at: string;
+  updated_at?: string;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -60,7 +79,6 @@ export async function POST(request: NextRequest) {
     const forwarded = request.headers.get('x-forwarded-for');
     const ip = forwarded ? forwarded.split(',')[0] : 
                 request.headers.get('x-real-ip') || 
-                request.ip || 
                 'unknown';
 
     // Extract UTM parameters
@@ -111,40 +129,13 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status');
-    const lead_type = searchParams.get('lead_type');
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const offset = parseInt(searchParams.get('offset') || '0');
-
-    let query = supabase
-      .from('leads')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .range(offset, offset + limit - 1);
-
-    if (status) {
-      query = query.eq('status', status);
-    }
-
-    if (lead_type) {
-      query = query.eq('lead_type', lead_type);
-    }
-
-    const { data, error } = await query;
-
-    if (error) {
-      console.error('Database error:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch leads' },
-        { status: 500 }
-      );
-    }
-
+    // Note: Database integration not configured
+    // In production, connect to your database (Supabase, etc.) to fetch leads
     return NextResponse.json({ 
       success: true, 
-      data: data || [],
-      total: data?.length || 0
+      data: [],
+      total: 0,
+      message: 'Database not configured. Leads are sent via Telegram notifications.'
     });
 
   } catch (error) {
@@ -159,7 +150,7 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
-    const { id, status, notes } = body;
+    const { id } = body;
 
     if (!id) {
       return NextResponse.json(
@@ -168,36 +159,11 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const updateData: Partial<Lead> = {
-      updated_at: new Date().toISOString(),
-    };
-
-    if (status) {
-      updateData.status = status as 'new' | 'contacted' | 'converted' | 'closed';
-    }
-
-    if (notes !== undefined) {
-      updateData.notes = notes;
-    }
-
-    const { data: leadData, error } = await supabase
-      .from('leads')
-      .update(updateData)
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Database error:', error);
-      return NextResponse.json(
-        { error: 'Failed to update lead' },
-        { status: 500 }
-      );
-    }
-
+    // Note: Database integration not configured
+    // In production, connect to your database (Supabase, etc.) to update leads
     return NextResponse.json({ 
-      success: true, 
-      lead: leadData
+      success: false, 
+      message: 'Database not configured. Lead updates require database integration.'
     });
 
   } catch (error) {
