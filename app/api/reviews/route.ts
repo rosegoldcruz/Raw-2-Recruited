@@ -261,3 +261,43 @@ export async function PATCH(request: NextRequest) {
     );
   }
 }
+
+// DELETE - Remove a review by ID
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Review ID is required' },
+        { status: 400 }
+      );
+    }
+
+    const reviews = await loadReviews();
+    const reviewIndex = reviews.findIndex(r => r.id === id);
+
+    if (reviewIndex === -1) {
+      return NextResponse.json(
+        { error: 'Review not found' },
+        { status: 404 }
+      );
+    }
+
+    const deletedReview = reviews[reviewIndex];
+    reviews.splice(reviewIndex, 1);
+    await saveReviews(reviews);
+
+    return NextResponse.json({
+      success: true,
+      deleted: deletedReview,
+    });
+  } catch (error) {
+    console.error('Error deleting review:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete review' },
+      { status: 500 }
+    );
+  }
+}
