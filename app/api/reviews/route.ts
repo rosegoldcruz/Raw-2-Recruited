@@ -19,8 +19,8 @@ const REVIEWS_BLOB_PATH = 'reviews/reviews.json';
 
 // Send review to Telegram so we never lose it
 async function sendReviewToTelegram(review: Review): Promise<void> {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID;
+  const botToken = process.env.DYLAN_TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.DYLAN_CHAT_ID || process.env.TELEGRAM_CHAT_ID;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.raw2recruited.com';
   
   if (!botToken || !chatId) {

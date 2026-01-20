@@ -84,7 +84,7 @@ async function editMessage(botToken: string, chatId: number, messageId: number, 
 // Telegram webhook handler
 export async function POST(request: NextRequest) {
   try {
-    const botToken = process.env.TELEGRAM_BOT_TOKEN;
+    const botToken = process.env.DYLAN_TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
     
     if (!botToken) {
       return NextResponse.json({ error: 'Bot not configured' }, { status: 500 });
@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
 
 // GET endpoint to set up the webhook
 export async function GET(request: NextRequest) {
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const botToken = process.env.DYLAN_TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.raw2recruited.com';
   
   if (!botToken) {
