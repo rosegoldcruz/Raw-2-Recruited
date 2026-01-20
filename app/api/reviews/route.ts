@@ -21,6 +21,7 @@ const REVIEWS_BLOB_PATH = 'reviews/reviews.json';
 async function sendReviewToTelegram(review: Review): Promise<void> {
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.raw2recruited.com';
   
   if (!botToken || !chatId) {
     console.warn('Telegram not configured, skipping notification');
@@ -36,7 +37,8 @@ async function sendReviewToTelegram(review: Review): Promise<void> {
   }
   message += `\n💬 *Review:*\n${review.review_text}\n\n`;
   message += `✅ *Public Display:* ${review.display_public ? 'Yes' : 'No'}\n`;
-  message += `⏰ *Time:* ${new Date().toLocaleString()}`;
+  message += `⏰ *Time:* ${new Date().toLocaleString()}\n\n`;
+  message += `🆔 *ID:* \`${review.id}\``;
 
   try {
     await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
@@ -46,6 +48,14 @@ async function sendReviewToTelegram(review: Review): Promise<void> {
         chat_id: chatId,
         text: message,
         parse_mode: 'Markdown',
+        reply_markup: {
+          inline_keyboard: [
+            [
+              { text: '🗑 Delete Review', callback_data: `delete_review:${review.id}` },
+              { text: '👁 View All', url: `${siteUrl}/reviews` }
+            ]
+          ]
+        }
       }),
     });
   } catch (error) {
