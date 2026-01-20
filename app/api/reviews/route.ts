@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sanitizeInput } from '@/lib/analytics-utils';
-import fs from 'fs';
-import path from 'path';
+import { put, list, del } from '@vercel/blob';
 
 export const runtime = "nodejs";
 
@@ -16,35 +15,85 @@ interface Review {
   created_at: string;
 }
 
-// File path for storing reviews (in production, use a database)
-const REVIEWS_FILE = path.join(process.cwd(), 'data', 'reviews.json');
+const REVIEWS_BLOB_PATH = 'reviews/reviews.json';
 
-function ensureDataDirectory() {
-  const dataDir = path.join(process.cwd(), 'data');
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
+// Send review to Telegram so we never lose it
+async function sendReviewToTelegram(review: Review): Promise<void> {
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  
+  if (!botToken || !chatId) {
+    console.warn('Telegram not configured, skipping notification');
+    return;
+  }
+
+  const stars = '⭐'.repeat(review.rating);
+  let message = `📝 *NEW REVIEW SUBMITTED*\n\n`;
+  message += `${stars} (${review.rating}/5)\n\n`;
+  message += `👤 *From:* ${review.parent_name}\n`;
+  if (review.title) {
+    message += `📌 *Title:* ${review.title}\n`;
+  }
+  message += `\n💬 *Review:*\n${review.review_text}\n\n`;
+  message += `✅ *Public Display:* ${review.display_public ? 'Yes' : 'No'}\n`;
+  message += `⏰ *Time:* ${new Date().toLocaleString()}`;
+
+  try {
+    await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: chatId,
+        text: message,
+        parse_mode: 'Markdown',
+      }),
+    });
+  } catch (error) {
+    console.error('Failed to send review to Telegram:', error);
   }
 }
 
-function loadReviews(): Review[] {
+async function loadReviews(): Promise<Review[]> {
   try {
-    ensureDataDirectory();
-    if (fs.existsSync(REVIEWS_FILE)) {
-      const data = fs.readFileSync(REVIEWS_FILE, 'utf-8');
-      return JSON.parse(data);
+    // List blobs to find our reviews file
+    const { blobs } = await list({ prefix: 'reviews/' });
+    const reviewsBlob = blobs.find(b => b.pathname === REVIEWS_BLOB_PATH);
+    
+    if (!reviewsBlob) {
+      return [];
     }
+    
+    // Fetch the blob content
+    const response = await fetch(reviewsBlob.url);
+    if (!response.ok) {
+      return [];
+    }
+    
+    const reviews = await response.json();
+    return reviews as Review[];
   } catch (error) {
-    console.error('Error loading reviews:', error);
+    console.error('Error loading reviews from Blob:', error);
+    return [];
   }
-  return [];
 }
 
-function saveReviews(reviews: Review[]): void {
+async function saveReviews(reviews: Review[]): Promise<void> {
   try {
-    ensureDataDirectory();
-    fs.writeFileSync(REVIEWS_FILE, JSON.stringify(reviews, null, 2));
+    // Delete old blob if exists
+    const { blobs } = await list({ prefix: 'reviews/' });
+    const existingBlob = blobs.find(b => b.pathname === REVIEWS_BLOB_PATH);
+    if (existingBlob) {
+      await del(existingBlob.url);
+    }
+    
+    // Save new blob
+    await put(REVIEWS_BLOB_PATH, JSON.stringify(reviews, null, 2), {
+      access: 'public',
+      contentType: 'application/json',
+    });
   } catch (error) {
-    console.error('Error saving reviews:', error);
+    console.error('Error saving reviews to Blob:', error);
+    throw error;
   }
 }
 
@@ -55,7 +104,7 @@ function generateId(): string {
 // GET - Fetch all approved reviews
 export async function GET() {
   try {
-    const reviews = loadReviews();
+    const reviews = await loadReviews();
     
     // Filter to only show approved reviews that consent to public display
     const approvedReviews = reviews
@@ -138,15 +187,17 @@ export async function POST(request: NextRequest) {
       rating: Math.min(5, Math.max(1, Math.round(rating))),
       review_text: sanitizeInput(review_text.trim()).substring(0, 1000),
       display_public: Boolean(display_public),
-      // Auto-approve reviews for immediate display (can be changed to 'pending' for moderation)
       status: 'approved',
       created_at: new Date().toISOString(),
     };
 
-    // Load existing reviews and add new one
-    const reviews = loadReviews();
+    // ALWAYS send to Telegram first so we never lose a review
+    await sendReviewToTelegram(newReview);
+
+    // Then save to Blob storage
+    const reviews = await loadReviews();
     reviews.push(newReview);
-    saveReviews(reviews);
+    await saveReviews(reviews);
 
     return NextResponse.json({
       success: true,
@@ -185,7 +236,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const reviews = loadReviews();
+    const reviews = await loadReviews();
     const reviewIndex = reviews.findIndex(r => r.id === id);
 
     if (reviewIndex === -1) {
@@ -196,7 +247,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     reviews[reviewIndex].status = status;
-    saveReviews(reviews);
+    await saveReviews(reviews);
 
     return NextResponse.json({
       success: true,
