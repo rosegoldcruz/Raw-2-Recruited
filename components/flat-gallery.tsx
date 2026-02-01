@@ -19,6 +19,7 @@ const mediaItems: MediaItem[] = [
   { type: "video", src: "/assests/huddle.mp4", alt: "Team huddle" },
   { type: "video", src: "/assests/kick.mp4", alt: "Kicking technique" },
   { type: "video", src: "/assests/line.mp4", alt: "Line drills" },
+  { type: "video", src: "/assests/linefoot.mp4", alt: "Line footwork training" },
   { type: "video", src: "/assests/raw.mp4", alt: "Raw training footage" },
   { type: "video", src: "/assests/raw2.mp4", alt: "Raw training session 2" },
   { type: "video", src: "/assests/snap.mp4", alt: "Snap technique" },
@@ -26,6 +27,8 @@ const mediaItems: MediaItem[] = [
   { type: "image", src: "/assests/wework.jpeg", alt: "We work together" },
   { type: "video", src: "/assests/work.mp4", alt: "Work ethic" },
   { type: "image", src: "/assests/wrastle.jpeg", alt: "Wrestling technique" },
+  { type: "video", src: "/assests/zander.mp4", alt: "Zander training session" },
+  { type: "video", src: "/assests/zander holyfield.mp4", alt: "Zander Holyfield highlights" },
 ]
 
 export function FlatGallery() {
