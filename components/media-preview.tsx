@@ -1,6 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
-import { Play, ArrowRight } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 const mediaItems = [
@@ -43,14 +43,14 @@ export function MediaPreview() {
           {mediaItems.map((item, index) => (
             <div
               key={index}
-              className="group relative aspect-[3/4] rounded-xl overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 cursor-pointer"
+              className="relative aspect-[3/4] rounded-xl overflow-hidden border border-border"
             >
               {item.type === "image" ? (
                 <Image
                   src={item.src || "/placeholder.svg"}
                   alt={item.alt}
                   fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="object-cover"
                 />
               ) : (
                 <video
@@ -60,15 +60,6 @@ export function MediaPreview() {
                   muted
                   playsInline
                 />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
-
-              {item.type === "video" && (
-                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-12 h-12 bg-primary/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <Play className="w-5 h-5 text-primary-foreground ml-1" fill="currentColor" />
-                  </div>
-                </div>
               )}
             </div>
           ))}

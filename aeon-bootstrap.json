@@ -1,0 +1,169 @@
+{
+  "generated_at": "2026-02-01T00:00:00Z",
+  "file_map": {
+    "root_files": [
+      "README.md",
+      "DEPLOYMENT-CHECKLIST.md",
+      "TELEGRAM-ANALYTICS-README.md",
+      "package.json",
+      "pnpm-lock.yaml",
+      "package-lock.json",
+      "next.config.mjs",
+      "tsconfig.json",
+      "next-env.d.ts",
+      "components.json",
+      "env.example",
+      ".gitignore"
+    ],
+    "directories": {
+      "app": [
+        "app/layout.tsx",
+        "app/page.tsx",
+        "app/gallery/page.tsx",
+        "app/contact/page.tsx",
+        "app/reviews/page.tsx",
+        "app/thank-you/page.tsx",
+        "app/coaches/page.tsx",
+        "app/programs/page.tsx",
+        "app/programs/clinics/page.tsx",
+        "app/programs/esa/page.tsx",
+        "app/programs/private-training/page.tsx",
+        "app/programs/recruiting-services/page.tsx",
+        "app/programs/womens-flag-football/page.tsx",
+        "app/programs/womens-flag-football/[city]/page.tsx",
+        "app/programs/womens-flag-football/west-valley/page.tsx",
+        "app/api/leads/route.ts",
+        "app/api/reviews/route.ts",
+        "app/api/telegram-webhook/route.ts",
+        "app/api/test/route.ts"
+      ],
+      "components": [
+        "components/navbar.tsx",
+        "components/footer.tsx",
+        "components/media-preview.tsx",
+        "components/media-gallery.tsx",
+        "components/flat-gallery.tsx",
+        "components/contact-form.tsx",
+        "components/review-form.tsx",
+        "components/review-card.tsx",
+        "components/hero-section.tsx",
+        "components/page-hero.tsx",
+        "components/value-props.tsx",
+        "components/service-tiers.tsx",
+        "components/club-announcement.tsx",
+        "components/ui/*"
+      ],
+      "hooks": [
+        "hooks/use-lead-form.ts"
+      ],
+      "lib": [
+        "lib/analytics-utils.ts",
+        "lib/api-utils.ts",
+        "lib/env.ts",
+        "lib/telegram.ts",
+        "lib/utils.ts"
+      ],
+      "public": [
+        "public/assests/*",
+        "public/site.webmanifest"
+      ],
+      "styles": [
+        "styles/globals.css"
+      ]
+    }
+  },
+  "active_modules": {
+    "marketing-site": {
+      "status": "present",
+      "routes": [
+        "/",
+        "/gallery",
+        "/contact",
+        "/reviews",
+        "/thank-you",
+        "/coaches",
+        "/programs",
+        "/programs/clinics",
+        "/programs/esa",
+        "/programs/private-training",
+        "/programs/recruiting-services",
+        "/programs/womens-flag-football",
+        "/programs/womens-flag-football/west-valley",
+        "/programs/womens-flag-football/[city]"
+      ]
+    },
+    "media-gallery": {
+      "status": "present",
+      "components": [
+        "components/media-preview.tsx",
+        "components/media-gallery.tsx",
+        "components/flat-gallery.tsx"
+      ]
+    },
+    "leads-api": {
+      "status": "present",
+      "routes": ["/api/leads"]
+    },
+    "reviews-api": {
+      "status": "present",
+      "routes": ["/api/reviews"]
+    },
+    "telegram-webhook": {
+      "status": "present",
+      "routes": ["/api/telegram-webhook"]
+    }
+  },
+  "data_schema_snapshot": {
+    "datastores": [],
+    "notes": "No first-party database schemas detected in repository. Reviews are stored in Vercel Blob. Leads are sent to Telegram without DB persistence."
+  },
+  "router_map": {
+    "pages": [
+      { "path": "/", "file": "app/page.tsx" },
+      { "path": "/gallery", "file": "app/gallery/page.tsx" },
+      { "path": "/contact", "file": "app/contact/page.tsx" },
+      { "path": "/reviews", "file": "app/reviews/page.tsx" },
+      { "path": "/thank-you", "file": "app/thank-you/page.tsx" },
+      { "path": "/coaches", "file": "app/coaches/page.tsx" },
+      { "path": "/programs", "file": "app/programs/page.tsx" },
+      { "path": "/programs/clinics", "file": "app/programs/clinics/page.tsx" },
+      { "path": "/programs/esa", "file": "app/programs/esa/page.tsx" },
+      { "path": "/programs/private-training", "file": "app/programs/private-training/page.tsx" },
+      { "path": "/programs/recruiting-services", "file": "app/programs/recruiting-services/page.tsx" },
+      { "path": "/programs/womens-flag-football", "file": "app/programs/womens-flag-football/page.tsx" },
+      { "path": "/programs/womens-flag-football/west-valley", "file": "app/programs/womens-flag-football/west-valley/page.tsx" },
+      { "path": "/programs/womens-flag-football/[city]", "file": "app/programs/womens-flag-football/[city]/page.tsx" }
+    ],
+    "api": [
+      { "path": "/api/leads", "methods": ["GET", "POST", "PATCH"], "file": "app/api/leads/route.ts" },
+      { "path": "/api/reviews", "methods": ["GET", "POST", "PATCH", "DELETE"], "file": "app/api/reviews/route.ts" },
+      { "path": "/api/telegram-webhook", "methods": ["GET", "POST"], "file": "app/api/telegram-webhook/route.ts" },
+      { "path": "/api/test", "methods": ["POST"], "file": "app/api/test/route.ts" }
+    ]
+  },
+  "dependency_graph": {
+    "app": ["components", "lib", "hooks", "styles"],
+    "components": ["components/ui", "lib"],
+    "api": ["lib"]
+  },
+  "queued_tasks": [],
+  "execution_order": [
+    "Validate UI behavior changes",
+    "Confirm media playback flow",
+    "Update bootstrap session structure"
+  ],
+  "session_log": [
+    {
+      "timestamp": "2026-02-01T00:00:00Z",
+      "change": "Removed hover cues/play overlay from media preview to avoid misleading interactivity."
+    },
+    {
+      "timestamp": "2026-02-01T00:00:00Z",
+      "change": "Fixed snap video filename reference for gallery carousel."
+    },
+    {
+      "timestamp": "2026-02-01T00:00:00Z",
+      "change": "Generated AEON bootstrap session structure."
+    }
+  ]
+}
