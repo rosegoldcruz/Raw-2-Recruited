@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { Play } from "lucide-react"
 
@@ -28,10 +28,70 @@ const mediaItems: MediaItem[] = [
 
 export function CircularGallery() {
   const [rotation, setRotation] = useState(0)
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [touchStart, setTouchStart] = useState<number | null>(null)
+  const [touchEnd, setTouchEnd] = useState<number | null>(null)
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([])
 
   const itemCount = mediaItems.length
   const radius = 400
   const angleIncrement = 360 / itemCount
+
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50
+
+  // Handle video playback when index changes
+  useEffect(() => {
+    videoRefs.current.forEach((video, index) => {
+      if (video) {
+        if (index === currentIndex) {
+          video.volume = 1.0
+          video.play().catch(() => {
+            // Autoplay might be blocked, ignore error
+          })
+        } else {
+          video.pause()
+          video.currentTime = 0
+        }
+      }
+    })
+  }, [currentIndex])
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null)
+    setTouchStart(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX)
+  }
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return
+    
+    const distance = touchStart - touchEnd
+    const isLeftSwipe = distance > minSwipeDistance
+    const isRightSwipe = distance < -minSwipeDistance
+
+    if (isLeftSwipe) {
+      setRotation((prev) => prev + angleIncrement)
+      setCurrentIndex((prev) => (prev + 1) % itemCount)
+    }
+    if (isRightSwipe) {
+      setRotation((prev) => prev - angleIncrement)
+      setCurrentIndex((prev) => (prev - 1 + itemCount) % itemCount)
+    }
+  }
+
+  const goToPrevious = () => {
+    setRotation((prev) => prev - angleIncrement)
+    setCurrentIndex((prev) => (prev - 1 + itemCount) % itemCount)
+  }
+
+  const goToNext = () => {
+    setRotation((prev) => prev + angleIncrement)
+    setCurrentIndex((prev) => (prev + 1) % itemCount)
+  }
 
   return (
     <section id="gallery" className="py-20 bg-background overflow-hidden">
@@ -45,7 +105,8 @@ export function CircularGallery() {
           </p>
         </div>
 
-        <div className="relative w-full h-[800px] flex items-center justify-center">
+        {/* Desktop 3D Carousel */}
+        <div className="hidden lg:block relative w-full h-[800px]">
           <div
             className="relative w-full h-full"
             style={{
@@ -115,18 +176,100 @@ export function CircularGallery() {
           {/* Navigation Controls */}
           <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-4 z-10">
             <button
-              onClick={() => setRotation((prev) => prev - angleIncrement)}
+              onClick={goToPrevious}
               className="bg-card border-2 border-border hover:border-primary text-foreground px-6 py-3 rounded-full font-bold transition-all hover:scale-105"
             >
               ← Previous
             </button>
             <button
-              onClick={() => setRotation((prev) => prev + angleIncrement)}
+              onClick={goToNext}
               className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 rounded-full font-bold transition-all hover:scale-105"
             >
               Next →
             </button>
           </div>
+        </div>
+
+        {/* Mobile Simple Carousel */}
+        <div 
+          className="lg:hidden relative"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div className="relative min-h-[400px] flex items-center justify-center touch-pan-y">
+            {mediaItems.map((item, index) => (
+              <div
+                key={index}
+                classNamref={(el) => (videoRefs.current[index] = el)}
+                        src={item.src}
+                        className="w-auto h-auto max-w-full"
+                        loop
+                        playsInline
+                <div className="max-w-lg mx-auto px-4">
+                  <div className="relative rounded-2xl overflow-hidden border-2 border-border bg-card shadow-2xl">
+                    {item.type === "image" ? (
+                      <Image
+                        src={item.src}
+                        alt={item.alt}
+                        width={800}
+                        height={800}
+                        className="w-auto h-auto max-w-full"
+                      />
+                    ) : (
+                      <video
+                        src={item.src}
+                        className="w-auto h-auto max-w-full"
+                        loop
+                        muted
+                        playsInline
+                        autoPlay
+                        controls
+                      />
+                    )}
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background/90 to-transparent p-4">
+                      <p className="text-foreground font-bold text-sm">{item.alt}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Mobile Navigation */}
+          <div className="flex justify-center gap-4 mt-6">
+            <button
+              onClick={goToPrevious}
+              className="bg-card border-2 border-border text-foreground px-6 py-3 rounded-full font-bold transition-all active:scale-95 touch-manipulation min-w-[44px] min-h-[44px]"
+            >
+              ← Prev
+            </button>
+            <div className="flex items-center gap-1">
+              {mediaItems.map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setCurrentIndex(idx)
+                    setRotation(idx * angleIncrement)
+                  }}
+                  className={`w-2 h-2 rounded-full transition-all touch-manipulation ${
+                    idx === currentIndex 
+                      ? 'bg-primary w-8' 
+                      : 'bg-muted-foreground/30'
+                  }`}
+                  aria-label={`Go to slide ${idx + 1}`}
+                />
+              ))}
+            </div>
+            <button
+              onClick={goToNext}
+              className="bg-primary text-primary-foreground px-6 py-3 rounded-full font-bold transition-all active:scale-95 touch-manipulation min-w-[44px] min-h-[44px]"
+            >
+              Next →
+            </button>
+          </div>
+
+          <p className="text-center mt-4 text-sm text-muted-foreground">← Swipe to browse →</p>
         </div>
 
         <div className="mt-12 text-center">

@@ -52,32 +52,34 @@ export function MediaGallery() {
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-4 justify-center items-start">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {mediaItems.map((item, index) => (
             <div
               key={index}
-              className="group relative rounded-xl overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 cursor-pointer"
+              className="group relative rounded-xl overflow-hidden border border-border hover:border-primary/50 transition-all duration-300 cursor-pointer bg-card"
             >
-              {item.type === "image" ? (
-                <Image
-                  src={item.src || "/placeholder.svg"}
-                  alt={item.alt}
-                  width={600}
-                  height={600}
-                  className="w-auto h-auto max-w-full max-h-[600px] group-hover:scale-105 transition-transform duration-500"
-                  style={{ objectFit: 'contain' }}
-                />
-              ) : (
-                <video
-                  src={item.src}
-                  className="w-auto h-auto max-w-full max-h-[600px]"
-                  style={{ objectFit: 'contain' }}
-                  controls
-                  preload="metadata"
-                >
-                  <source src={item.src} type="video/mp4" />
-                </video>
-              )}
+              <div className="flex items-center justify-center min-h-[300px] sm:min-h-[400px]">
+                {item.type === "image" ? (
+                  <Image
+                    src={item.src || "/placeholder.svg"}
+                    alt={item.alt}
+                    width={800}
+                    height={800}
+                    className="w-auto h-auto max-w-full group-hover:scale-105 transition-transform duration-500"
+                    loading={index < 3 ? 'eager' : 'lazy'}
+                  />
+                ) : (
+                  <video
+                    src={item.src}
+                    className="w-auto h-auto max-w-full"
+                    controls
+                    preload="metadata"
+                    playsInline
+                  >
+                    <source src={item.src} type="video/mp4" />
+                  </video>
+                )}
+              </div>
               <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
             </div>
           ))}

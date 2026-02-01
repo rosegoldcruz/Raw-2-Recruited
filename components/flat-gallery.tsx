@@ -95,31 +95,31 @@ export function FlatGallery() {
         </div>
 
         <div className="relative group">
-          <div className="overflow-hidden" ref={emblaRef}>
+          <div className="overflow-hidden touch-pan-y" ref={emblaRef}>
             <div className="flex -ml-4">
               {mediaItems.map((item, index) => (
                 <div
                   key={index}
                   className="pl-4 flex-[0_0_100%] min-w-0"
                 >
-                  <div className="max-w-4xl mx-auto relative rounded-2xl overflow-hidden border border-border bg-card flex items-center justify-center min-h-[400px]">
+                  <div className="max-w-4xl mx-auto relative rounded-2xl overflow-hidden border border-border bg-card flex items-center justify-center min-h-[300px] md:min-h-[400px]">
                     {item.type === "image" ? (
                       <Image
                         src={item.src}
                         alt={item.alt}
                         width={1200}
                         height={800}
-                        className="w-auto h-auto max-w-full max-h-[80vh]"
-                        style={{ objectFit: 'contain' }}
+                        className="w-auto h-auto max-w-full"
+                        priority={index === 0}
                       />
                     ) : (
                       <video
                         src={item.src}
-                        className="w-auto h-auto max-w-full max-h-[80vh]"
-                        style={{ objectFit: 'contain' }}
+                        className="w-auto h-auto max-w-full"
                         loop
                         playsInline
                         controls
+                        preload="metadata"
                       />
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
@@ -129,10 +129,11 @@ export function FlatGallery() {
             </div>
           </div>
 
+          {/* Desktop hover buttons */}
           <Button
             variant="outline"
             size="icon"
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm border-border hover:bg-background text-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm border-border hover:bg-background text-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 w-12 h-12"
             onClick={scrollPrev}
           >
             <ChevronLeft className="h-6 w-6" />
@@ -142,13 +143,37 @@ export function FlatGallery() {
           <Button
             variant="outline"
             size="icon"
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm border-border hover:bg-background text-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 bg-background/80 backdrop-blur-sm border-border hover:bg-background text-foreground rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 w-12 h-12"
+            onClick={scrollNext}
+          >
+            <ChevronRight className="h-6 w-6" />
+            <span className="sr-only">Next slide</span>
+          </Button>
+
+          {/* Mobile touch-friendly buttons */}
+          <Button
+            variant="outline"
+            size="icon"
+            className="md:hidden absolute left-2 top-1/2 -translate-y-1/2 bg-background/90 backdrop-blur-sm border-border text-foreground rounded-full w-12 h-12 touch-manipulation"
+            onClick={scrollPrev}
+          >
+            <ChevronLeft className="h-6 w-6" />
+            <span className="sr-only">Previous slide</span>
+          </Button>
+
+          <Button
+            variant="outline"
+            size="icon"
+            className="md:hidden absolute right-2 top-1/2 -translate-y-1/2 bg-background/90 backdrop-blur-sm border-border text-foreground rounded-full w-12 h-12 touch-manipulation"
             onClick={scrollNext}
           >
             <ChevronRight className="h-6 w-6" />
             <span className="sr-only">Next slide</span>
           </Button>
         </div>
+
+        {/* Swipe indicator for mobile */}
+        <p className="md:hidden text-center mt-4 text-sm text-muted-foreground">← Swipe to browse →</p>
       </div>
     </section>
   )
