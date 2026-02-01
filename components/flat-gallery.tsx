@@ -23,7 +23,7 @@ const mediaItems: MediaItem[] = [
   { type: "video", src: "/assests/raw.mp4", alt: "Raw training footage" },
   { type: "video", src: "/assests/raw2.mp4", alt: "Raw training session 2" },
   { type: "video", src: "/assests/snap.mp4", alt: "Snap technique" },
-  { type: "video", src: "/assests/snap2.mp4", alt: "Snap drill 2" },
+  { type: "video", src: "/assests/snaap2.mp4", alt: "Snap drill 2" },
   { type: "image", src: "/assests/wework.jpeg", alt: "We work together" },
   { type: "video", src: "/assests/work.mp4", alt: "Work ethic" },
   { type: "image", src: "/assests/wrastle.jpeg", alt: "Wrestling technique" },
