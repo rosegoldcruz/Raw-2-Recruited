@@ -38,6 +38,25 @@ export function FlatGallery() {
     slidesToScroll: 1,
   })
 
+  // Pause all videos when slide changes
+  React.useEffect(() => {
+    if (!emblaApi) return
+
+    const pauseAllVideos = () => {
+      const videos = emblaApi.rootNode().querySelectorAll('video')
+      videos.forEach(video => {
+        video.pause()
+        video.currentTime = 0
+      })
+    }
+
+    emblaApi.on('select', pauseAllVideos)
+    
+    return () => {
+      emblaApi.off('select', pauseAllVideos)
+    }
+  }, [emblaApi])
+
   const scrollPrev = React.useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev()
   }, [emblaApi])
