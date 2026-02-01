@@ -67,25 +67,28 @@ export function CircularGallery() {
                 return (
                   <div
                     key={index}
-                    className="absolute top-1/2 left-1/2 w-64 h-80 cursor-pointer group"
+                    className="absolute top-1/2 left-1/2 max-w-md cursor-pointer group"
                     style={{
                       transform: `translate(-50%, -50%) translate3d(${x}px, 0, ${z}px) rotateY(${-angle}deg)`,
                       transformStyle: "preserve-3d",
                     }}
                   >
-                    <div className="relative w-full h-full rounded-2xl overflow-hidden border-2 border-border hover:border-primary transition-all duration-300 shadow-2xl bg-card">
+                    <div className="relative rounded-2xl overflow-hidden border-2 border-border hover:border-primary transition-all duration-300 shadow-2xl bg-card">
                       {item.type === "image" ? (
                         <Image
                           src={item.src}
                           alt={item.alt}
-                          fill
-                          className="object-cover group-hover:scale-110 transition-transform duration-500"
+                          width={400}
+                          height={400}
+                          className="w-auto h-auto max-w-full group-hover:scale-105 transition-transform duration-500"
+                          style={{ objectFit: 'contain' }}
                         />
                       ) : (
-                        <div className="relative w-full h-full">
+                        <div className="relative">
                           <video
                             src={item.src}
-                            className="w-full h-full object-cover"
+                            className="w-auto h-auto max-w-full max-h-[600px]"
+                            style={{ objectFit: 'contain' }}
                             loop
                             muted
                             playsInline

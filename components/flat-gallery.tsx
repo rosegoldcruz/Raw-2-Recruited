@@ -66,22 +66,26 @@ export function FlatGallery() {
                   key={index}
                   className="pl-4 flex-[0_0_100%] min-w-0"
                 >
-                  <div className="max-w-sm mx-auto relative aspect-[9/16] rounded-2xl overflow-hidden border border-border bg-card">
+                  <div className="max-w-4xl mx-auto relative rounded-2xl overflow-hidden border border-border bg-card flex items-center justify-center min-h-[400px]">
                     {item.type === "image" ? (
                       <Image
                         src={item.src}
                         alt={item.alt}
-                        fill
-                        className="object-cover"
+                        width={1200}
+                        height={800}
+                        className="w-auto h-auto max-w-full max-h-[80vh]"
+                        style={{ objectFit: 'contain' }}
                       />
                     ) : (
                       <video
                         src={item.src}
-                        className="w-full h-full object-cover"
+                        className="w-auto h-auto max-w-full max-h-[80vh]"
+                        style={{ objectFit: 'contain' }}
                         loop
                         muted
                         playsInline
                         autoPlay
+                        controls
                       />
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
