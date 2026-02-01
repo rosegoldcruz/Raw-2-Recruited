@@ -38,22 +38,39 @@ export function FlatGallery() {
     slidesToScroll: 1,
   })
 
-  // Pause all videos when slide changes
+  // Stop previous videos and autoplay current video when slide changes
   React.useEffect(() => {
     if (!emblaApi) return
 
-    const pauseAllVideos = () => {
-      const videos = emblaApi.rootNode().querySelectorAll('video')
-      videos.forEach(video => {
-        video.pause()
-        video.currentTime = 0
+    const handleSlideChange = () => {
+      const slides = emblaApi.slideNodes()
+      const selectedIndex = emblaApi.selectedScrollSnap()
+      
+      // Pause and reset all videos
+      slides.forEach((slide, index) => {
+        const video = slide.querySelector('video')
+        if (video) {
+          video.pause()
+          video.currentTime = 0
+          video.volume = 1.0
+        }
       })
+      
+      // Autoplay the current slide's video
+      const currentSlide = slides[selectedIndex]
+      const currentVideo = currentSlide?.querySelector('video')
+      if (currentVideo) {
+        currentVideo.play().catch(() => {
+          // Autoplay might be blocked by browser, ignore the error
+        })
+      }
     }
 
-    emblaApi.on('select', pauseAllVideos)
+    emblaApi.on('select', handleSlideChange)
+    handleSlideChange() // Initialize on mount
     
     return () => {
-      emblaApi.off('select', pauseAllVideos)
+      emblaApi.off('select', handleSlideChange)
     }
   }, [emblaApi])
 
@@ -101,9 +118,7 @@ export function FlatGallery() {
                         className="w-auto h-auto max-w-full max-h-[80vh]"
                         style={{ objectFit: 'contain' }}
                         loop
-                        muted
                         playsInline
-                        autoPlay
                         controls
                       />
                     )}
