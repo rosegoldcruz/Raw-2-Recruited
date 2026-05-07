@@ -2,7 +2,6 @@
 
 import type React from "react"
 
-import { useRouter } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
@@ -56,8 +55,9 @@ const thisIsNotFor = [
 ]
 
 export default function ESAPage() {
-  const router = useRouter()
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitMessage, setSubmitMessage] = useState("")
+  const [submitError, setSubmitError] = useState("")
   const [formData, setFormData] = useState({
     athleteName: "",
     age: "",
@@ -75,23 +75,34 @@ export default function ESAPage() {
 
     try {
       setIsSubmitting(true)
-      const res = await fetch("/api/leads", {
+      setSubmitMessage("")
+      setSubmitError("")
+
+      const res = await fetch("/api/apply/esa", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          source: "esa",
-          ...formData,
+          athlete_name: formData.athleteName,
+          age: Number(formData.age),
+          grade: formData.grade,
+          esa_status: formData.esaStatus,
+          athletic_experience: formData.experience,
+          primary_goal: formData.goal,
+          parent_name: formData.parentName,
+          parent_email: formData.parentEmail,
+          parent_phone: formData.parentPhone,
         }),
       })
 
       if (!res.ok) {
-        throw new Error(`Lead submission failed: ${res.status}`)
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body?.error ?? `Application failed: ${res.status}`)
       }
 
-      router.push("/thank-you")
+      setSubmitMessage("Application submitted successfully. We will contact you within 48 hours.")
     } catch (err) {
-      console.error("Lead submission failed", err)
-      alert("Submission failed. Please try again.")
+      console.error("ESA submission failed", err)
+      setSubmitError(err instanceof Error ? err.message : "Submission failed. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -278,6 +289,17 @@ export default function ESAPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-8 space-y-8">
+            {submitMessage ? (
+              <div className="rounded-lg border border-primary/30 bg-primary/10 p-4 text-sm text-foreground">
+                {submitMessage}
+              </div>
+            ) : null}
+            {submitError ? (
+              <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+                {submitError}
+              </div>
+            ) : null}
+
             {/* Athlete Information */}
             <div>
               <h3 className="text-lg font-bold text-foreground mb-4 pb-2 border-b border-border">

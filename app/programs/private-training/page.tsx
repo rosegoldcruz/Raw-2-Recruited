@@ -3,7 +3,6 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
@@ -59,9 +58,10 @@ const thisIsNotFor = [
 ]
 
 export default function PrivateTrainingPage() {
-  const router = useRouter()
   const [formStep, setFormStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitMessage, setSubmitMessage] = useState("")
+  const [submitError, setSubmitError] = useState("")
   const [formData, setFormData] = useState({
     athleteName: "",
     athleteAge: "",
@@ -83,23 +83,38 @@ export default function PrivateTrainingPage() {
 
     try {
       setIsSubmitting(true)
-      const res = await fetch("/api/leads", {
+      setSubmitMessage("")
+      setSubmitError("")
+
+      const goalsText = formData.whyPrivateTraining
+        ? `${formData.goals}\n\nWhy private training:\n${formData.whyPrivateTraining}`
+        : formData.goals
+
+      const res = await fetch("/api/apply/private-training", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          source: "private-training",
-          ...formData,
+          athlete_name: formData.athleteName,
+          age: Number(formData.athleteAge),
+          position: formData.position,
+          current_level: formData.currentLevel,
+          goals: goalsText,
+          parent_name: formData.parentName,
+          parent_email: formData.parentEmail,
+          parent_phone: formData.parentPhone,
         }),
       })
 
       if (!res.ok) {
-        throw new Error(`Lead submission failed: ${res.status}`)
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body?.error ?? `Application failed: ${res.status}`)
       }
 
-      router.push("/thank-you")
+      setSubmitMessage("Application submitted successfully. We will contact you within 48 hours.")
+      setFormStep(1)
     } catch (err) {
-      console.error("Lead submission failed", err)
-      alert("Submission failed. Please try again.")
+      console.error("Private training submission failed", err)
+      setSubmitError(err instanceof Error ? err.message : "Submission failed. Please try again.")
     } finally {
       setIsSubmitting(false)
     }
@@ -304,6 +319,17 @@ export default function PrivateTrainingPage() {
           </div>
 
           <form onSubmit={handleSubmit} className="bg-background border border-border rounded-2xl p-8">
+            {submitMessage ? (
+              <div className="mb-6 rounded-lg border border-primary/30 bg-primary/10 p-4 text-sm text-foreground">
+                {submitMessage}
+              </div>
+            ) : null}
+            {submitError ? (
+              <div className="mb-6 rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
+                {submitError}
+              </div>
+            ) : null}
+
             {/* Progress Indicator */}
             <div className="flex items-center justify-center gap-2 mb-8">
               {[1, 2, 3].map((step) => (
