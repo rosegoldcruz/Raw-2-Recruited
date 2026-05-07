@@ -1,6 +1,6 @@
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
-import { ContactForm } from "@/components/contact-form"
+import { AvailabilityCalendar } from "@/components/AvailabilityCalendar"
 import { Phone, MapPin, Instagram, Clock } from "lucide-react"
 
 export default function ContactPage() {
@@ -21,7 +21,7 @@ export default function ContactPage() {
 
           <div className="grid lg:grid-cols-2 gap-12">
             <div>
-              <ContactForm />
+              <AvailabilityCalendar />
             </div>
 
             <div className="space-y-8">
