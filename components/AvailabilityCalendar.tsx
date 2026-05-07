@@ -141,7 +141,7 @@ export function AvailabilityCalendar() {
   }
 
   return (
-    <div className="space-y-5 rounded-2xl border border-border bg-card p-4 sm:p-6">
+    <div className="w-full min-w-full space-y-5 rounded-2xl border border-border bg-card p-4 sm:p-6">
       <div className="flex items-center justify-between gap-2">
         <Button variant="outline" onClick={() => setWeekStart((prev) => subWeeks(prev, 1))}>
           Prev
@@ -157,67 +157,77 @@ export function AvailabilityCalendar() {
       {loading ? (
         <p className="py-6 text-center text-sm text-muted-foreground">Loading availability...</p>
       ) : (
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-7">
-          {weekDays.map((day) => {
-            const dayRecords = records.filter((record) => {
-              try {
-                return isSameDay(parseISO(record.date), day)
-              } catch {
-                return false
-              }
-            })
+        <div className="overflow-x-auto">
+          <div className="flex min-w-full gap-3">
+            {weekDays.map((day) => {
+              const dayRecords = records.filter((record) => {
+                try {
+                  return isSameDay(parseISO(record.date), day)
+                } catch {
+                  return false
+                }
+              })
 
-            return (
-              <div key={day.toISOString()} className="rounded-xl border border-border p-3">
-                <p className="mb-3 text-sm font-bold text-foreground">{format(day, "EEE MMM d")}</p>
+              return (
+                <div
+                  key={day.toISOString()}
+                  className="w-[calc((100%-1.5rem)/3)] min-w-[120px] flex-1 shrink-0 rounded-xl border border-border p-3 sm:w-auto"
+                >
+                  <div className="mb-3 text-center">
+                    <p className="text-sm font-bold text-foreground">{format(day, "EEEE")}</p>
+                    <p className="text-xs text-muted-foreground">{format(day, "MMM d")}</p>
+                  </div>
 
-                <div className="space-y-2">
-                  {dayRecords.length === 0 ? (
-                    <div className="rounded-md bg-muted px-2 py-1 text-xs text-muted-foreground">No slots</div>
-                  ) : (
-                    dayRecords.map((record) => {
-                      const isSelected = (record.Id ?? record.id) === (selected?.Id ?? selected?.id)
+                  <div className="space-y-2">
+                    {dayRecords.length === 0 ? (
+                      <div className="py-5 text-center text-sm text-muted-foreground">No slots</div>
+                    ) : (
+                      dayRecords.map((record) => {
+                        const isSelected = (record.Id ?? record.id) === (selected?.Id ?? selected?.id)
 
-                      if (!record.is_available) {
+                        if (!record.is_available) {
+                          return (
+                            <div
+                              key={String(record.Id ?? record.id ?? `${record.date}-${record.start_time}`)}
+                              className="w-full rounded-md border border-border border-l-4 border-l-slate-400 bg-muted px-3 py-2"
+                            >
+                              <p className="whitespace-nowrap text-[13px] text-muted-foreground">
+                                {formatTime12h(record.start_time)} - {formatTime12h(record.end_time)}
+                              </p>
+                              <p className="mt-1 text-[13px] font-semibold text-slate-500">Full</p>
+                            </div>
+                          )
+                        }
+
                         return (
                           <div
                             key={String(record.Id ?? record.id ?? `${record.date}-${record.start_time}`)}
-                            className="rounded-md border border-border bg-muted px-2 py-2 text-xs text-muted-foreground"
+                            className={`w-full rounded-md border border-border border-l-4 border-l-emerald-500 bg-emerald-50 px-3 py-2 ${
+                              isSelected ? "ring-1 ring-primary" : ""
+                            }`}
                           >
-                            <div>{formatTime12h(record.start_time)} - {formatTime12h(record.end_time)}</div>
-                            <div className="mt-1 font-semibold">Full</div>
+                            <p className="whitespace-nowrap text-[13px] text-foreground">
+                              {formatTime12h(record.start_time)} - {formatTime12h(record.end_time)}
+                            </p>
+                            <Button
+                              size="sm"
+                              className="mt-2 h-8 w-full bg-[#DC2626] text-[13px] font-semibold text-white hover:bg-[#B91C1C]"
+                              onClick={() => {
+                                setSelected(record)
+                                setError(null)
+                              }}
+                            >
+                              Book
+                            </Button>
                           </div>
                         )
-                      }
-
-                      return (
-                        <div
-                          key={String(record.Id ?? record.id ?? `${record.date}-${record.start_time}`)}
-                          className={`rounded-md border px-2 py-2 text-xs ${
-                            isSelected
-                              ? 'border-primary bg-primary/20 text-foreground'
-                              : 'border-emerald-300 bg-emerald-100 text-emerald-950'
-                          }`}
-                        >
-                          <div>{formatTime12h(record.start_time)} - {formatTime12h(record.end_time)}</div>
-                          <Button
-                            size="sm"
-                            className="mt-2 h-7 w-full"
-                            onClick={() => {
-                              setSelected(record)
-                              setError(null)
-                            }}
-                          >
-                            Book
-                          </Button>
-                        </div>
-                      )
-                    })
-                  )}
+                      })
+                    )}
+                  </div>
                 </div>
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
       )}
 
