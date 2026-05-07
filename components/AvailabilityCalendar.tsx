@@ -1,7 +1,21 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { addDays, addWeeks, format, isSameDay, parseISO, startOfWeek, subWeeks } from "date-fns"
+import {
+  addDays,
+  endOfMonth,
+  endOfWeek,
+  format,
+  isSameDay,
+  isSameMonth,
+  isToday,
+  parseISO,
+  startOfDay,
+  startOfMonth,
+  startOfWeek,
+  subMonths,
+  addMonths,
+} from "date-fns"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -43,10 +57,15 @@ function formatTime12h(value: string) {
   return `${hour12}:${String(minute).padStart(2, "0")} ${suffix}`
 }
 
+function dateKey(value: Date) {
+  return format(value, "yyyy-MM-dd")
+}
+
 export function AvailabilityCalendar() {
   const [records, setRecords] = useState<AvailabilityRecord[]>([])
   const [loading, setLoading] = useState(true)
-  const [weekStart, setWeekStart] = useState(startOfWeek(new Date(), { weekStartsOn: 1 }))
+  const [currentMonth, setCurrentMonth] = useState(startOfMonth(new Date()))
+  const [selectedDay, setSelectedDay] = useState(startOfDay(new Date()))
   const [selected, setSelected] = useState<AvailabilityRecord | null>(null)
   const [formData, setFormData] = useState<BookingFormData>(defaultFormData)
   const [submitting, setSubmitting] = useState(false)
@@ -76,10 +95,66 @@ export function AvailabilityCalendar() {
     void loadAvailability()
   }, [loadAvailability])
 
-  const weekDays = useMemo(
-    () => Array.from({ length: 7 }, (_, i) => addDays(weekStart, i)),
-    [weekStart]
-  )
+  const availabilityByDay = useMemo(() => {
+    const map = new Map<string, AvailabilityRecord[]>()
+
+    for (const record of records) {
+      const key = record.date
+      const existing = map.get(key) ?? []
+      existing.push(record)
+      map.set(key, existing)
+    }
+
+    for (const [key, value] of map.entries()) {
+      map.set(
+        key,
+        [...value].sort((a, b) => a.start_time.localeCompare(b.start_time))
+      )
+    }
+
+    return map
+  }, [records])
+
+  const calendarDays = useMemo(() => {
+    const monthStart = startOfMonth(currentMonth)
+    const monthEnd = endOfMonth(currentMonth)
+    const gridStart = startOfWeek(monthStart, { weekStartsOn: 0 })
+    const gridEnd = endOfWeek(monthEnd, { weekStartsOn: 0 })
+
+    const days: Date[] = []
+    let day = gridStart
+    while (day <= gridEnd) {
+      days.push(day)
+      day = addDays(day, 1)
+    }
+
+    return days
+  }, [currentMonth])
+
+  const selectedDaySlots = useMemo(() => {
+    return availabilityByDay.get(dateKey(selectedDay)) ?? []
+  }, [availabilityByDay, selectedDay])
+
+  useEffect(() => {
+    if (selectedDaySlots.length > 0) return
+
+    const monthRows = records.filter((record) => {
+      try {
+        return isSameMonth(parseISO(record.date), currentMonth)
+      } catch {
+        return false
+      }
+    })
+
+    if (monthRows.length > 0) {
+      const firstDate = monthRows
+        .map((row) => row.date)
+        .sort((a, b) => a.localeCompare(b))[0]
+      if (firstDate) {
+        setSelectedDay(parseISO(firstDate))
+      }
+    }
+  }, [currentMonth, records, selectedDaySlots.length])
 
   const onFieldChange = (field: keyof BookingFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }))
@@ -141,100 +216,134 @@ export function AvailabilityCalendar() {
   }
 
   return (
-    <div className="w-full min-w-full space-y-5 rounded-2xl border border-border bg-card p-4 sm:p-6">
+    <div className="w-full min-w-full space-y-5 rounded-2xl border border-white/10 bg-[#0a0a0a] p-4 sm:p-6">
       <div className="flex items-center justify-between gap-2">
-        <Button variant="outline" onClick={() => setWeekStart((prev) => subWeeks(prev, 1))}>
-          Prev
+        <Button
+          variant="outline"
+          onClick={() => setCurrentMonth((prev) => subMonths(prev, 1))}
+          className="border-white/15 bg-[#111] text-white hover:bg-white/10"
+        >
+          Prev Month
         </Button>
-        <p className="text-center text-sm font-semibold text-foreground sm:text-base">
-          {format(weekStart, "MMM d")} - {format(addDays(weekStart, 6), "MMM d, yyyy")}
+        <p className="text-center text-sm font-semibold text-white sm:text-base">
+          {format(currentMonth, "MMMM yyyy")}
         </p>
-        <Button variant="outline" onClick={() => setWeekStart((prev) => addWeeks(prev, 1))}>
-          Next
+        <Button
+          variant="outline"
+          onClick={() => setCurrentMonth((prev) => addMonths(prev, 1))}
+          className="border-white/15 bg-[#111] text-white hover:bg-white/10"
+        >
+          Next Month
         </Button>
       </div>
 
       {loading ? (
-        <p className="py-6 text-center text-sm text-muted-foreground">Loading availability...</p>
+        <p className="py-6 text-center text-sm text-zinc-400">Loading availability...</p>
       ) : (
-        <div className="overflow-x-auto">
-          <div className="flex min-w-full gap-3">
-            {weekDays.map((day) => {
-              const dayRecords = records.filter((record) => {
-                try {
-                  return isSameDay(parseISO(record.date), day)
-                } catch {
-                  return false
-                }
-              })
-
-              return (
-                <div
-                  key={day.toISOString()}
-                  className="w-[calc((100%-1.5rem)/3)] min-w-[120px] flex-1 shrink-0 rounded-xl border border-border p-3 sm:w-auto"
-                >
-                  <div className="mb-3 text-center">
-                    <p className="text-sm font-bold text-foreground">{format(day, "EEEE")}</p>
-                    <p className="text-xs text-muted-foreground">{format(day, "MMM d")}</p>
-                  </div>
-
-                  <div className="space-y-2">
-                    {dayRecords.length === 0 ? (
-                      <div className="py-5 text-center text-sm text-muted-foreground">No slots</div>
-                    ) : (
-                      dayRecords.map((record) => {
-                        const isSelected = (record.Id ?? record.id) === (selected?.Id ?? selected?.id)
-
-                        if (!record.is_available) {
-                          return (
-                            <div
-                              key={String(record.Id ?? record.id ?? `${record.date}-${record.start_time}`)}
-                              className="w-full rounded-md border border-border border-l-4 border-l-slate-400 bg-muted px-3 py-2"
-                            >
-                              <p className="whitespace-nowrap text-[13px] text-muted-foreground">
-                                {formatTime12h(record.start_time)} - {formatTime12h(record.end_time)}
-                              </p>
-                              <p className="mt-1 text-[13px] font-semibold text-slate-500">Full</p>
-                            </div>
-                          )
-                        }
-
-                        return (
-                          <div
-                            key={String(record.Id ?? record.id ?? `${record.date}-${record.start_time}`)}
-                            className={`w-full rounded-md border border-border border-l-4 border-l-emerald-500 bg-emerald-50 px-3 py-2 ${
-                              isSelected ? "ring-1 ring-primary" : ""
-                            }`}
-                          >
-                            <p className="whitespace-nowrap text-[13px] text-foreground">
-                              {formatTime12h(record.start_time)} - {formatTime12h(record.end_time)}
-                            </p>
-                            <Button
-                              size="sm"
-                              className="mt-2 h-8 w-full bg-[#DC2626] text-[13px] font-semibold text-white hover:bg-[#B91C1C]"
-                              onClick={() => {
-                                setSelected(record)
-                                setError(null)
-                              }}
-                            >
-                              Book
-                            </Button>
-                          </div>
-                        )
-                      })
-                    )}
-                  </div>
+        <div className="grid w-full min-w-full gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+          <div className="rounded-xl border border-white/10 bg-[#111] p-4">
+            <div className="mb-3 grid grid-cols-7 gap-2">
+              {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((label) => (
+                <div key={label} className="text-center text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                  {label}
                 </div>
-              )
-            })}
+              ))}
+            </div>
+            <div className="grid grid-cols-7 gap-2">
+              {calendarDays.map((day) => {
+                const key = dateKey(day)
+                const hasSlots = (availabilityByDay.get(key)?.length ?? 0) > 0
+                const selectedDayMatch = isSameDay(day, selectedDay)
+                const inMonth = isSameMonth(day, currentMonth)
+
+                return (
+                  <button
+                    key={day.toISOString()}
+                    type="button"
+                    disabled={!hasSlots}
+                    onClick={() => {
+                      setSelectedDay(day)
+                      setSelected(null)
+                      setError(null)
+                    }}
+                    className={`relative h-12 rounded-md border text-sm transition-colors ${
+                      selectedDayMatch
+                        ? "border-[#DC2626] bg-[#DC2626] text-white"
+                        : hasSlots
+                          ? "border-[#DC2626]/35 bg-[#DC2626]/10 text-white hover:bg-[#DC2626]/20"
+                          : "cursor-not-allowed border-white/10 bg-[#0f0f0f] text-zinc-500"
+                    } ${inMonth ? "opacity-100" : "opacity-45"}`}
+                  >
+                    <span>{format(day, "d")}</span>
+                    {isToday(day) && !selectedDayMatch ? (
+                      <span className="absolute bottom-1 left-1/2 h-1 w-1 -translate-x-1/2 rounded-full bg-zinc-300" />
+                    ) : null}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-white/10 bg-[#111] p-4">
+            <div className="mb-4 border-b border-white/10 pb-3 text-center">
+              <p className="text-sm font-semibold text-white">{format(selectedDay, "EEEE")}</p>
+              <p className="text-xs text-zinc-400">{format(selectedDay, "MMMM d, yyyy")}</p>
+            </div>
+
+            <div className="space-y-2">
+              {selectedDaySlots.length === 0 ? (
+                <div className="py-6 text-center text-sm text-zinc-500">No slots available</div>
+              ) : (
+                selectedDaySlots.map((record) => {
+                  const isSelected = (record.Id ?? record.id) === (selected?.Id ?? selected?.id)
+
+                  if (!record.is_available) {
+                    return (
+                      <div
+                        key={String(record.Id ?? record.id ?? `${record.date}-${record.start_time}`)}
+                        className="w-full rounded-md border border-white/10 border-l-4 border-l-zinc-500 bg-[#1a1a1a] px-3 py-2"
+                      >
+                        <p className="whitespace-nowrap text-[13px] text-zinc-400">
+                          {formatTime12h(record.start_time)} - {formatTime12h(record.end_time)}
+                        </p>
+                        <p className="mt-1 text-[13px] font-semibold text-zinc-500">Full</p>
+                      </div>
+                    )
+                  }
+
+                  return (
+                    <div
+                      key={String(record.Id ?? record.id ?? `${record.date}-${record.start_time}`)}
+                      className={`w-full rounded-md border border-zinc-300 border-l-4 border-l-emerald-500 bg-zinc-100 px-3 py-2 ${
+                        isSelected ? "ring-1 ring-[#DC2626]" : ""
+                      }`}
+                    >
+                      <p className="whitespace-nowrap text-[13px] text-zinc-900">
+                        {formatTime12h(record.start_time)} - {formatTime12h(record.end_time)}
+                      </p>
+                      <Button
+                        size="sm"
+                        className="mt-2 h-8 w-full bg-[#DC2626] text-[13px] font-semibold text-white hover:bg-[#B91C1C]"
+                        onClick={() => {
+                          setSelected(record)
+                          setError(null)
+                        }}
+                      >
+                        Book
+                      </Button>
+                    </div>
+                  )
+                })
+              )}
+            </div>
           </div>
         </div>
       )}
 
       {selected && (
-        <div className="rounded-xl border border-border bg-background p-4">
-          <h4 className="mb-1 text-lg font-bold text-foreground">Book Session</h4>
-          <p className="mb-4 text-sm text-muted-foreground">
+        <div className="rounded-xl border border-white/10 bg-[#111] p-4">
+          <h4 className="mb-1 text-lg font-bold text-white">Book Session</h4>
+          <p className="mb-4 text-sm text-zinc-400">
             {format(parseISO(selected.date), 'EEEE, MMM d, yyyy')} at {formatTime12h(selected.start_time)} - {formatTime12h(selected.end_time)}
           </p>
 
@@ -247,21 +356,23 @@ export function AvailabilityCalendar() {
           <form onSubmit={submitBooking} className="space-y-3">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <Label htmlFor="parent_name">Parent Name</Label>
+                <Label htmlFor="parent_name" className="text-white">Parent Name</Label>
                 <Input
                   id="parent_name"
                   value={formData.parent_name}
                   onChange={(e) => onFieldChange('parent_name', e.target.value)}
+                  className="border-white/15 bg-[#0f0f0f] text-white"
                   required
                 />
               </div>
 
               <div>
-                <Label htmlFor="player_name">Player Name</Label>
+                <Label htmlFor="player_name" className="text-white">Player Name</Label>
                 <Input
                   id="player_name"
                   value={formData.player_name}
                   onChange={(e) => onFieldChange('player_name', e.target.value)}
+                  className="border-white/15 bg-[#0f0f0f] text-white"
                   required
                 />
               </div>
@@ -269,34 +380,37 @@ export function AvailabilityCalendar() {
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
-                <Label htmlFor="parent_email">Parent Email</Label>
+                <Label htmlFor="parent_email" className="text-white">Parent Email</Label>
                 <Input
                   id="parent_email"
                   type="email"
                   value={formData.parent_email}
                   onChange={(e) => onFieldChange('parent_email', e.target.value)}
+                  className="border-white/15 bg-[#0f0f0f] text-white"
                   required
                 />
               </div>
 
               <div>
-                <Label htmlFor="parent_phone">Parent Phone</Label>
+                <Label htmlFor="parent_phone" className="text-white">Parent Phone</Label>
                 <Input
                   id="parent_phone"
                   value={formData.parent_phone}
                   onChange={(e) => onFieldChange('parent_phone', e.target.value)}
+                  className="border-white/15 bg-[#0f0f0f] text-white"
                   required
                 />
               </div>
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Button type="submit" disabled={submitting}>
+              <Button type="submit" disabled={submitting} className="bg-[#DC2626] text-white hover:bg-[#B91C1C]">
                 {submitting ? 'Submitting...' : 'Confirm Booking'}
               </Button>
               <Button
                 type="button"
                 variant="outline"
+                className="border-white/15 bg-[#0f0f0f] text-white hover:bg-white/10"
                 onClick={() => {
                   setSelected(null)
                   setError(null)
