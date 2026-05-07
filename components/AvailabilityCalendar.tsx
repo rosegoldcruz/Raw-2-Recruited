@@ -314,11 +314,13 @@ export function AvailabilityCalendar() {
                   return (
                     <div
                       key={String(record.Id ?? record.id ?? `${record.date}-${record.start_time}`)}
-                      className={`w-full rounded-md border border-zinc-300 border-l-4 border-l-emerald-500 bg-zinc-100 px-3 py-2 ${
-                        isSelected ? "ring-1 ring-[#DC2626]" : ""
+                      className={`w-full rounded-md px-3 py-2 transition-all ${
+                        isSelected
+                          ? "border-[3px] border-[#DC2626] bg-[rgba(220,38,38,0.15)] shadow-[0_0_0_1px_rgba(220,38,38,0.35)]"
+                          : "border border-zinc-300 border-l-4 border-l-emerald-500 bg-zinc-100"
                       }`}
                     >
-                      <p className="whitespace-nowrap text-[13px] text-zinc-900">
+                      <p className={`whitespace-nowrap text-[13px] ${isSelected ? "text-white" : "text-zinc-900"}`}>
                         {formatTime12h(record.start_time)} - {formatTime12h(record.end_time)}
                       </p>
                       <Button
