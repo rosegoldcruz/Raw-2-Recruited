@@ -31,6 +31,18 @@ const defaultFormData: BookingFormData = {
   player_name: "",
 }
 
+function formatTime12h(value: string) {
+  const [rawHour, rawMinute] = value.split(":")
+  const hour = Number(rawHour)
+  const minute = Number(rawMinute)
+
+  if (Number.isNaN(hour) || Number.isNaN(minute)) return value
+
+  const suffix = hour >= 12 ? "PM" : "AM"
+  const hour12 = hour % 12 === 0 ? 12 : hour % 12
+  return `${hour12}:${String(minute).padStart(2, "0")} ${suffix}`
+}
+
 export function AvailabilityCalendar() {
   const [records, setRecords] = useState<AvailabilityRecord[]>([])
   const [loading, setLoading] = useState(true)
@@ -40,6 +52,11 @@ export function AvailabilityCalendar() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [lastBookedSlot, setLastBookedSlot] = useState<{
+    date: string
+    startTime: string
+    endTime: string
+  } | null>(null)
 
   const loadAvailability = useCallback(async () => {
     try {
@@ -93,6 +110,11 @@ export function AvailabilityCalendar() {
       }
 
       setSuccess(true)
+      setLastBookedSlot({
+        date: selected.date,
+        startTime: selected.start_time,
+        endTime: selected.end_time,
+      })
       setSelected(null)
       setFormData(defaultFormData)
       await loadAvailability()
@@ -109,7 +131,9 @@ export function AvailabilityCalendar() {
       <div className="rounded-2xl border border-border bg-card p-6 text-center">
         <h3 className="mb-2 text-2xl font-black text-foreground">Booking Submitted</h3>
         <p className="mb-5 text-muted-foreground">
-          Your booking request has been received. We will follow up with confirmation details shortly.
+          Your booking request for {lastBookedSlot ? format(parseISO(lastBookedSlot.date), "EEEE, MMM d, yyyy") : "your selected day"}{" "}
+          at {lastBookedSlot ? `${formatTime12h(lastBookedSlot.startTime)} - ${formatTime12h(lastBookedSlot.endTime)}` : "your selected time"}{" "}
+          has been received. We will follow up with confirmation details shortly.
         </p>
         <Button onClick={() => setSuccess(false)}>Book Another Session</Button>
       </div>
@@ -160,7 +184,7 @@ export function AvailabilityCalendar() {
                             key={String(record.Id ?? record.id ?? `${record.date}-${record.start_time}`)}
                             className="rounded-md border border-border bg-muted px-2 py-2 text-xs text-muted-foreground"
                           >
-                            <div>{record.start_time} - {record.end_time}</div>
+                            <div>{formatTime12h(record.start_time)} - {formatTime12h(record.end_time)}</div>
                             <div className="mt-1 font-semibold">Full</div>
                           </div>
                         )
@@ -175,7 +199,7 @@ export function AvailabilityCalendar() {
                               : 'border-emerald-300 bg-emerald-100 text-emerald-950'
                           }`}
                         >
-                          <div>{record.start_time} - {record.end_time}</div>
+                          <div>{formatTime12h(record.start_time)} - {formatTime12h(record.end_time)}</div>
                           <Button
                             size="sm"
                             className="mt-2 h-7 w-full"
@@ -201,7 +225,7 @@ export function AvailabilityCalendar() {
         <div className="rounded-xl border border-border bg-background p-4">
           <h4 className="mb-1 text-lg font-bold text-foreground">Book Session</h4>
           <p className="mb-4 text-sm text-muted-foreground">
-            {format(parseISO(selected.date), 'EEEE, MMM d, yyyy')} at {selected.start_time}
+            {format(parseISO(selected.date), 'EEEE, MMM d, yyyy')} at {formatTime12h(selected.start_time)} - {formatTime12h(selected.end_time)}
           </p>
 
           {error && (
