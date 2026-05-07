@@ -49,7 +49,7 @@ async function sendTelegramMessage(payload: BookingPayload) {
   if (!DYLAN_TELEGRAM_BOT_TOKEN || !DYLAN_CHAT_ID) return
 
   const text =
-    `🏈 New Booking - Raw2Recruited\n\n` +
+    `🏈 New Booking — Raw2Recruited\n\n` +
     `👤 Parent: ${payload.parent_name}\n` +
     `📧 Email: ${payload.parent_email}\n` +
     `📞 Phone: ${payload.parent_phone}\n` +
@@ -119,29 +119,33 @@ export async function POST(request: NextRequest) {
       (row) => row.date === bookingPayload.session_date && row.start_time === bookingPayload.session_time
     )
 
-    if (matchedRow) {
-      const rowId = matchedRow.Id ?? matchedRow.id
+    if (!matchedRow) {
+      return NextResponse.json({ error: 'Failed to find matching availability slot' }, { status: 500 })
+    }
 
-      if (rowId !== undefined) {
-        const nextBookedSlots = Number(matchedRow.booked_slots ?? 0) + 1
-        const maxSlots = Number(matchedRow.max_slots ?? 0)
-        const isAvailable = nextBookedSlots < maxSlots
+    const rowId = matchedRow.Id ?? matchedRow.id
 
-        const updateResponse = await fetch(`${NOCODB_BASE}/api/v2/tables/${AVAIL_TABLE}/records`, {
-          method: 'PATCH',
-          headers: nocoHeaders,
-          body: JSON.stringify({
-            Id: rowId,
-            booked_slots: nextBookedSlots,
-            is_available: isAvailable,
-          }),
-        })
+    if (rowId === undefined) {
+      return NextResponse.json({ error: 'Failed to resolve availability row id' }, { status: 500 })
+    }
 
-        if (!updateResponse.ok) {
-          console.error('[booking] availability update failed', updateResponse.status, await updateResponse.text())
-          return NextResponse.json({ error: 'Failed to update availability' }, { status: 500 })
-        }
-      }
+    const nextBookedSlots = Number(matchedRow.booked_slots ?? 0) + 1
+    const maxSlots = Number(matchedRow.max_slots ?? 0)
+    const isAvailable = nextBookedSlots < maxSlots
+
+    const updateResponse = await fetch(`${NOCODB_BASE}/api/v2/tables/${AVAIL_TABLE}/records`, {
+      method: 'PATCH',
+      headers: nocoHeaders,
+      body: JSON.stringify({
+        Id: rowId,
+        booked_slots: nextBookedSlots,
+        is_available: isAvailable,
+      }),
+    })
+
+    if (!updateResponse.ok) {
+      console.error('[booking] availability update failed', updateResponse.status, await updateResponse.text())
+      return NextResponse.json({ error: 'Failed to update availability' }, { status: 500 })
     }
 
     void sendTelegramMessage(bookingPayload)
